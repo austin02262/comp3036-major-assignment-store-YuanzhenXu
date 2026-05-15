@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+# GameHub Admin Dashboard
 
-## Getting Started
+This application is the administrator dashboard for the GameHub B2C video game store. It runs as part of the COMP3036 Major Assignment monorepo and is responsible for store management features.
 
-First, run the development server:
+## Purpose
+
+The admin dashboard will allow authorised administrators to manage the video game catalogue and review customer purchase records.
+
+## Planned Admin Features
+
+| Feature | Description | Status |
+| --- | --- | --- |
+| Admin login | Restrict dashboard access to authenticated administrators. | Existing base available |
+| Product list | View all video games in the store catalogue. | Planned |
+| Product create | Add new games with title, description, price, image, category, platform, and stock quantity. | Planned |
+| Product update | Edit existing game information. | Planned |
+| Product delete | Remove games from the store catalogue. | Planned |
+| Purchase records | View completed orders, purchased items, dates, and totals. | Planned |
+
+## Local Development
+
+Run the admin application from the repository root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm --filter @repo/admin dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The admin dashboard runs on:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```txt
+http://localhost:3002
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
+To run both the storefront and admin dashboard together:
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Related Application
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The customer storefront is located in:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```txt
+apps/web
+```
 
-## Deploy on Vercel
+It runs on:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```txt
+http://localhost:3001
+```
