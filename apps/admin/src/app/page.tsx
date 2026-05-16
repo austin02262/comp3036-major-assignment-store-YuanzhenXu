@@ -1,9 +1,9 @@
 // apps/admin/src/app/page.tsx
 import { isLoggedIn } from "../utils/auth";
-import { PostList } from "../components/PostList";
+import { ProductList } from "../components/ProductList";
 import { LogoutButton } from "../components/LogoutButton";
 import styles from "./page.module.css";
-import { client } from "@repo/db/client";
+import { adminProducts } from "../data/adminProducts";
 
 
 export default async function Home({
@@ -19,8 +19,8 @@ export default async function Home({
   if (!loggedIn) {
     return (
       <main className={styles.loginBox}>
-        <h1>Sign in to your account</h1>
-        {/* This now submits to the unified auth route, which supports both form and JSON requests. */}
+        <p className={styles.loginEyebrow}>GameHub Admin</p>
+        <h1>Sign in to manage products</h1>
         <form method="POST" action="/api/auth">
           <label htmlFor="password">Password</label>
           <input 
@@ -35,26 +35,45 @@ export default async function Home({
     );
   }
 
-  // Load posts from the database on the server so the admin list starts with real persisted data.
-  const posts = await client.db.post.findMany({
-    orderBy: {
-      date: "desc",
-    },
-  });
-
   // ===== AUTHENTICATED VIEW: Admin Dashboard =====
+  const activeProducts = adminProducts.filter((product) => product.active).length;
+  const platformCount = new Set(
+    adminProducts.flatMap((product) => product.platforms),
+  ).size;
+
   return (
     <main className={styles.main}>
       {/* Header section with title and action buttons */}
       <div className={styles.header}>
-        <h1>Admin of Full Stack Blog</h1>
+        <div>
+          <p className={styles.eyebrow}>GameHub Storefront</p>
+          <h1>Product Admin Dashboard</h1>
+          <p className={styles.headerText}>
+            Manage video game products, prices, platforms, and storefront
+            availability for the B2C store prototype.
+          </p>
+        </div>
         <div className={styles.actions}>
-          {/* Navigates to post creation screen */}
-          <a href="/posts/create" className={styles.createBtn}>Create Post</a>
+          <a href="/products/create" className={styles.createBtn}>Add New Game</a>
           {/* Logout uses the auth DELETE endpoint required by the assignment. */}
           <LogoutButton className={styles.logoutBtn} />
         </div>
       </div>
+
+      <section className={styles.stats} aria-label="Store overview">
+        <article>
+          <span>Total products</span>
+          <strong>{adminProducts.length}</strong>
+        </article>
+        <article>
+          <span>Available products</span>
+          <strong>{activeProducts}</strong>
+        </article>
+        <article>
+          <span>Platforms</span>
+          <strong>{platformCount}</strong>
+        </article>
+      </section>
 
       {params.saved === "1" && (
         <p
@@ -66,13 +85,12 @@ export default async function Home({
             color: "#065f46",
           }}
         >
-          Post updated successfully
+          Product updated successfully
         </p>
       )}
       
      
-      {/* Pass server-fetched posts into the client component so filtering/toggling can happen locally. */}
-      <PostList initialPosts={posts} />
+      <ProductList initialProducts={adminProducts} />
     </main>
   );
 }
