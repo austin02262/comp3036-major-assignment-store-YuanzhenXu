@@ -14,8 +14,8 @@ export function TagList({
   if (tagItems.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-950/80">
+      <h3 className="mb-4 border-b border-gray-200 pb-3 text-sm font-black uppercase tracking-wide text-gray-950 dark:border-white/10 dark:text-white">Platforms</h3>
       <ul className="space-y-2">
         {tagItems.map((item) => {
           // ✅ 转换成小写，空格变连字符

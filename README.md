@@ -2,6 +2,8 @@
 
 GameHub is a full-stack B2C video game store built for the COMP3036 Full Stack Development Major Assignment, Option 2. The project extends the existing assignment monorepo into an online store where customers can browse digital games, search and filter products, add games to a cart, complete a mock checkout, and view purchase history. Administrators can manage products and review purchase records.
 
+This project is based on the codebase from the previous COMP3036 Blog Project assignments 2.1, 2.2, and 2.3. The original blog frontend, admin dashboard, database package, tests, and monorepo structure are being modified and extended into a B2C video game store application.
+
 ## Applications
 
 | App | URL | Purpose |
@@ -154,5 +156,7 @@ Course: COMP3036 Full Stack Development
 Assignment: Major Assignment, Option 2 - B2C Store Application
 
 Theme: Video game store
+
+Base code: COMP3036 Blog Project assignments 2.1, 2.2, and 2.3
 
 The final submission will include source code, a deployed application URL, E2E tests, a CI pipeline, API documentation, and a short demo video.

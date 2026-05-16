@@ -2,29 +2,11 @@ import { history } from "@/functions/history";
 import { type Post } from "@repo/db/data";
 import { SummaryItem } from "./SummaryItem";
 
-const months = [
-  "",
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
 export function HistoryList({
   selectedYear,
-  selectedMonth,
   posts,
 }: {
   selectedYear?: string;
-  selectedMonth?: string;
   posts: Post[];
 }) {
   const historyItems = history(posts);
@@ -32,20 +14,18 @@ export function HistoryList({
   if (historyItems.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">History</h3>
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-950/80">
+      <h3 className="mb-4 border-b border-gray-200 pb-3 text-sm font-black uppercase tracking-wide text-gray-950 dark:border-white/10 dark:text-white">Release Year</h3>
       <ul className="space-y-2">
-        {historyItems.map(({ year, month, count }) => {
-          const monthName = months[month] || "";
-          const displayName = `${monthName}, ${year}`;
-          const link = `/history/${year}/${month}`;
-          const isSelected =
-            selectedYear === year.toString() && selectedMonth === month.toString();
+        {historyItems.map(({ year, count }) => {
+          const displayName = year.toString();
+          const link = `/history/${year}`;
+          const isSelected = selectedYear === year.toString();
           return (
-            <li key={`${year}-${month}`}>
+            <li key={year}>
               <SummaryItem
                 name={displayName}
-                title={`History / ${displayName}`}
+                title={`Release Year / ${displayName}`}
                 link={link}
                 count={count}
                 isSelected={isSelected}

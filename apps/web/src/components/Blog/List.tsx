@@ -1,68 +1,49 @@
 import type { Post } from "@repo/db/data";
-
-function cleanTitle(title: string): string {
-  return title.replace(/[!,]/g, '').replace(/\s+/g, ' ').trim();
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-}
+import { GameImage } from "@/components/Store/GameImage";
+import { ProductGrid } from "@/components/Store/ProductGrid";
 
 export function BlogList({ posts }: { posts: Post[] }) {
   if (posts.length === 0) {
-    return <div className="text-center py-12 bg-gray-50 rounded-lg">0 Posts</div>;
+    return (
+      <div className="rounded-lg border border-gray-800 bg-gray-950 py-16 text-center text-gray-300">
+        0 Games
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      {posts.map((post) => (
-        <article
-          key={post.id}
-          data-test-id={`blog-post-${post.id}`}
-          className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-        >
-          <div className="flex flex-col md:flex-row">
-            {post.imageUrl && (
-              <div className="md:w-1/3 h-48 md:h-auto bg-gray-100">
-                <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
-              </div>
-            )}
-
-            <div className="p-6 flex-1">
-              <a
-                href={`/post/${post.urlId}`}
-                className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
-              >
-                {cleanTitle(post.title)}
-              </a>
-
-              <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-500">
-                <time>{formatDate(post.date)}</time> • <span>{post.category}</span> •{" "}
-                <span>{post.views} views</span> • <span>{post.likes} likes</span>
-              </div>
-
-              <p className="mt-3 text-gray-600 line-clamp-3">
-                {post.description.replace(cleanTitle(post.title), "").trim()}
-              </p>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {post.tags.split(",").map((tag) => {
-                  const tagSlug = tag.trim().toLowerCase().replace(/\s+/g, '-');
-                  return (
-                    <a
-                      key={tag}
-                      href={`/tags/${tagSlug}`}
-                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
-                    >
-                      #{tag.trim()}
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
+    <div className="space-y-8">
+      <section className="relative overflow-hidden rounded-2xl bg-blue-950 text-white shadow-2xl shadow-blue-950/15">
+        {["/games/scroll1.jpg", "/games/scroll2.png", "/games/scroll3.avif", "/games/scroll4.jpg"].map((src) => (
+          <GameImage
+            key={src}
+            src={src}
+            alt="GameHub featured games"
+            title="GameHub"
+            className="hero-slide absolute inset-0 h-full w-full object-cover opacity-0"
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-950 via-blue-950/80 to-blue-950/20" />
+        <div className="relative px-6 py-12 md:px-8 lg:px-10">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-wide text-blue-200">
+              Welcome to GameHub
+            </p>
+            <h1 className="mt-3 text-4xl font-normal tracking-tight md:text-6xl">
+              Your Digital Game Store
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-blue-50">
+              Discover console favourites across PlayStation, Xbox, and Nintendo
+              Switch. GameHub brings together action adventures, racing games,
+              RPGs, and digital editions in one simple storefront, with quick
+              filtering, clear prices, and a mock checkout flow for the final
+              project demo.
+            </p>
           </div>
-        </article>
-      ))}
+        </div>
+      </section>
+
+      <ProductGrid posts={posts} />
     </div>
   );
 }

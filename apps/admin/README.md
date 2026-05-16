@@ -2,6 +2,8 @@
 
 This application is the administrator dashboard for the GameHub B2C video game store. It runs as part of the COMP3036 Major Assignment monorepo and is responsible for store management features.
 
+This admin app is based on the previous COMP3036 Blog Project assignments 2.1, 2.2, and 2.3. The existing blog admin codebase is being modified and extended into a product and purchase management dashboard for the video game store.
+
 ## Purpose
 
 The admin dashboard will allow authorised administrators to manage the video game catalogue and review customer purchase records.

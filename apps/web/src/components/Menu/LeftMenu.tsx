@@ -7,7 +7,16 @@ export async function LeftMenu() {
   const posts = await getPublicPosts();
 
   return (
-    <div className="p-4 space-y-6 bg-[var(--background)] text-[var(--text)]">
+    <div className="space-y-4 text-[var(--text)]">
+      <a href="/" className="block rounded-2xl bg-blue-700 p-5 text-white shadow-lg shadow-blue-950/20 dark:bg-blue-600">
+        <p className="text-xs font-bold uppercase tracking-wide text-blue-100">
+          Filter Console Games
+        </p>
+        <p className="mt-2 text-2xl font-black tracking-tight">Find Your Next Play</p>
+        <p className="mt-2 text-sm leading-6 text-blue-100">
+          Narrow the catalogue by genre, release year, or platform.
+        </p>
+      </a>
       <CategoryList posts={posts} />
       <HistoryList posts={posts} />
       <TagList posts={posts} />  {/* left menu only has three parts: Category/history/Tag */}

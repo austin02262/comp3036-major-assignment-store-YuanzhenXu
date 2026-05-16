@@ -12,25 +12,23 @@ export default async function SearchPage({
   const { q } = await searchParams;
   const posts = await getPublicPosts();
 
-  // Normalize the query: convert to lowercase for case-insensitive matching
-  const query = q?.toLowerCase() || "";
+  const query = q?.trim().toLowerCase() || "";
 
-  // Filter posts based on title, description, or tags
   const filteredPosts = posts.filter(post => {
-    // Check if the title contains the search query
-    const titleMatch = post.title.toLowerCase().includes(query);
+    if (!query) return true;
 
-    // Check if the description contains the search query
-    const descMatch = post.description?.toLowerCase().includes(query);
+    const titleWords = post.title
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean);
+    const titleMatch = titleWords.includes(query);
+    const releaseYearMatch = post.date.getFullYear().toString() === query;
+    const categoryMatch = post.category.toLowerCase() === query;
+    const platformMatch = post.tags
+      .split(",")
+      .some((tag) => tag.trim().toLowerCase() === query);
 
-    // Check if any tag contains the search query
-    // Example: "React, NextJS" → ["React", "NextJS"]
-    const tagsMatch = post.tags
-      .split(',')
-      .some(tag => tag.trim().toLowerCase().includes(query));
-
-    // A post matches if ANY of the fields match
-    return titleMatch || descMatch || tagsMatch;
+    return titleMatch || releaseYearMatch || categoryMatch || platformMatch;
   });
 
   return (
@@ -39,7 +37,7 @@ export default async function SearchPage({
       <div className="mb-4">
         {query && (
           <p className="text-gray-600">
-            Showing results for: "{query}"
+            Showing games for: "{query}"
           </p>
         )}
       </div>

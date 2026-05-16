@@ -1,99 +1,112 @@
-import { marked } from "marked";
-
-import { LikeButton } from "./LikeButton";
-
-type BlogDetailPost = {
-  id: number;
-  urlId: string;
-  title: string;
-  imageUrl: string;
-  date: Date;
-  category: string;
-  views: number;
-  tags: string;
-  content: string;
-};
-
-function cleanTitle(title: string): string {
-  return title.replace(/[!,]/g, "").replace(/\s+/g, " ").trim();
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
+import type { Post } from "@repo/db/data";
+import { AddToCartButton } from "@/components/Store/AddToCartButton";
+import { GameGallery } from "@/components/Store/GameGallery";
+import { GameImage } from "@/components/Store/GameImage";
+import { formatPrice, postToProduct } from "@/lib/storeProducts";
 
 export function BlogDetail({
   post,
-  likes,
-  liked,
 }: {
-  post: BlogDetailPost;
+  post: Post;
   likes: number;
   liked: boolean;
 }) {
-  // Convert markdown stored in the database into HTML for the blog detail view.
-  const renderedMarkdown = marked.parse(post.content) as string;
+  const product = postToProduct(post);
 
   return (
-    <article
-      data-test-id={`blog-post-${post.id}`}
-      className="overflow-hidden rounded-xl bg-white shadow-md"
-    >
-      {post.imageUrl && (
-        <div className="h-64 bg-gray-100 md:h-96">
-          <img
-            src={post.imageUrl}
-            alt={post.title}
-            className="h-full w-full object-cover"
-          />
-        </div>
-      )}
-
-      <div className="p-6 md:p-8">
-        <a
-          href={`/post/${post.urlId}`}
-          className="block text-3xl font-bold text-gray-900 transition-colors hover:text-blue-600 md:text-4xl"
-        >
-          {cleanTitle(post.title)}
-        </a>
-
-        <div className="mt-2 mb-6 flex flex-wrap items-center gap-2 text-sm text-gray-500">
-          <time>{formatDate(post.date)}</time> •
-          <span>{post.category}</span> •
-          <span>{post.views} views</span>
-        </div>
-
-        <div className="mb-6">
-          {/* Like state is passed in from the server so the first render already matches the database. */}
-          <LikeButton postId={post.id} initialLikes={likes} initialLiked={liked} />
-        </div>
-
-        <div
-          data-test-id="content-markdown"
-          className="prose prose-lg max-w-none"
-          // We inject parsed markdown here so the saved post content renders with formatting.
-          dangerouslySetInnerHTML={{ __html: renderedMarkdown }}
+    <article data-test-id={`blog-post-${post.id}`} className="space-y-8">
+      <section className="relative overflow-hidden rounded-2xl bg-gray-950 text-white shadow-2xl shadow-gray-950/15">
+        <GameImage
+          src={product.imageUrl}
+          alt={product.title}
+          title={product.title}
+          className="absolute inset-0 h-full w-full object-cover opacity-45"
         />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/85 to-gray-950/20" />
 
-        <div className="mt-8 flex flex-wrap gap-2">
-          {post.tags.split(",").map((tag) => {
-            const tagSlug = tag.trim().toLowerCase().replace(/\s+/g, "-");
-            return (
+        <div className="relative grid gap-8 px-6 py-10 md:grid-cols-[1fr_330px] md:px-8 lg:px-10">
+          <div>
+            <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wide">
               <a
-                key={tag}
-                href={`/tags/${tagSlug}`}
-                className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200"
+                href={`/category/${encodeURIComponent(product.category.toLowerCase())}`}
+                className="rounded-full bg-red-600 px-3 py-1 text-white hover:bg-red-700"
               >
-                #{tag.trim()}
+                {product.category}
               </a>
-            );
-          })}
+              {product.platforms.map((platform) => (
+                <a
+                  key={platform}
+                  href={`/tags/${encodeURIComponent(platform.toLowerCase().replace(/\s+/g, "-"))}`}
+                  className="rounded-full bg-white/15 px-3 py-1 text-white hover:bg-white/25"
+                >
+                  {platform}
+                </a>
+              ))}
+              <a
+                href={`/search?q=${product.releaseYear}`}
+                className="rounded-full bg-white/15 px-3 py-1 text-white hover:bg-white/25"
+              >
+                Released {product.releaseYear}
+              </a>
+            </div>
+
+            <h1 className="mt-5 max-w-3xl text-4xl font-black leading-tight tracking-tight md:text-6xl">
+              {product.title}
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-gray-200">
+              {product.description}
+            </p>
+          </div>
+
+          <aside className="h-fit rounded-xl border border-white/10 bg-white/10 p-5 shadow-xl backdrop-blur">
+            <p className="text-sm font-semibold uppercase tracking-wide text-red-200">
+              Digital edition
+            </p>
+            <p className="mt-3 text-4xl font-bold">{formatPrice(product.price)}</p>
+            <div className="mt-6">
+              <AddToCartButton product={product} />
+            </div>
+          </aside>
         </div>
-      </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="rounded-xl border border-gray-200/70 bg-white/85 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5">
+          <h2 className="text-2xl font-bold text-gray-950 dark:text-white">About This Game</h2>
+          <p className="mt-4 text-base leading-8 text-gray-700 dark:text-gray-300">{product.content}</p>
+        </div>
+
+        <div className="rounded-xl bg-gray-950 p-6 text-white shadow-sm dark:border dark:border-white/10">
+          <h2 className="text-lg font-bold">Product Details</h2>
+          <dl className="mt-4 space-y-4 text-sm">
+            <div className="flex justify-between gap-4">
+              <dt className="text-gray-400">Genre</dt>
+              <dd className="font-semibold">{product.category}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-gray-400">Platform</dt>
+              <dd className="text-right font-semibold">{product.platform}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-gray-400">Release Date</dt>
+              <dd className="text-right font-semibold">{product.releaseDate}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-gray-200/70 bg-white/85 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-red-700">
+              In-game Media
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-gray-950 dark:text-white">Gameplay Gallery</h2>
+          </div>
+        </div>
+
+        <GameGallery title={product.title} images={product.screenshots} />
+      </section>
     </article>
   );
 }
