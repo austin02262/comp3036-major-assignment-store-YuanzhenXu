@@ -1,67 +1,28 @@
 import { expect, test } from "./fixtures";
 
-test.describe("SEARCH SCREEN", () => {
-  test(
-    "Existing search result",
-    {
-      tag: "@a1",
-    },
-    async ({ page }) => {
-      await page.goto("/search?q=Fat");
+test.describe("CUSTOMER SEARCH", () => {
+  test("searches games by title", { tag: "@a1" }, async ({ page }) => {
+    await page.goto("/");
+    await page.getByPlaceholder("Search games").fill("halo");
 
-      // SEARCH SCREEN > Displays results based on search string stored in the query string (e.g. /search?q=Fat)
+    await expect(page).toHaveURL(/\/search\?q=halo/);
+    await expect(page.locator("article")).toHaveCount(1);
+    await expect(page.getByText("Halo Infinite")).toBeVisible();
+    await expect(page.getByText("God of War Ragnarok")).not.toBeVisible();
+  });
 
-      // console.log(await page.innerHTML("body"));
+  test("searches games by release year", { tag: "@a1" }, async ({ page }) => {
+    await page.goto("/search?q=2026");
 
-      const articles = await page.locator('[data-test-id^="blog-post-"]');
-      await expect(articles).toHaveCount(1);
+    await expect(page.locator("article")).toHaveCount(2);
+    await expect(page.getByText("Forza Horizon 6")).toBeVisible();
+    await expect(page.getByText("Yakuza Kiwami 3 & Dark Ties")).toBeVisible();
+  });
 
-      await expect(page.getByTestId("blog-post-2")).toBeVisible();
-      await expect(
-        page.getByText("Better front ends with Fatboy Slim"),
-      ).toBeVisible();
-    },
-  );
+  test("shows an empty state for no results", { tag: "@a1" }, async ({ page }) => {
+    await page.goto("/search?q=not-a-game");
 
-  test(
-    "Search finds multiple posts",
-    {
-      tag: "@a1",
-    },
-    async ({ page }) => {
-      await page.goto("/search?q=front");
-
-      // SEARCH SCREEN > Displays results based on search string stored in the query string (e.g. /search?q=Fat)
-
-      const articles = await page.locator('[data-test-id^="blog-post-"]');
-      await expect(articles).toHaveCount(2);
-
-      await expect(page.getByTestId("blog-post-2")).toBeVisible();
-      await expect(
-        page.getByText("Better front ends with Fatboy Slim"),
-      ).toBeVisible();
-
-      await expect(page.getByTestId("blog-post-3")).toBeVisible();
-      await expect(
-        page.getByText("No front end framework is the best"),
-      ).toBeVisible();
-    },
-  );
-
-  test(
-    "Invalid Search",
-    {
-      tag: "@a1",
-    },
-    async ({ page }) => {
-      await page.goto("/search?q=abc");
-
-      // SEARCH SCREEN > Displays "0 Posts" when search does not find anything
-
-      const articles = await page.locator('[data-test-id^="blog-post-"]');
-      await expect(articles).toHaveCount(0);
-
-      await expect(page.getByText("0 Posts")).toBeVisible();
-    },
-  );
+    await expect(page.locator("article")).toHaveCount(0);
+    await expect(page.getByText("0 Games")).toBeVisible();
+  });
 });
