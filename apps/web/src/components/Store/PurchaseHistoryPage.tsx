@@ -20,6 +20,7 @@ type Purchase = {
 };
 
 function readPurchases(): Purchase[] {
+  // Loads completed mock orders from the browser.
   try {
     return JSON.parse(window.localStorage.getItem(purchasesKey) || "[]") as Purchase[];
   } catch {
@@ -36,6 +37,7 @@ function readCart(): PurchaseItem[] {
 }
 
 function addPurchaseToCart(items: PurchaseItem[]) {
+  // Lets customers quickly repurchase a previous order.
   const cart = readCart();
 
   for (const item of items) {

@@ -11,11 +11,11 @@ export default async function Home({
 }: {
   searchParams?: Promise<{ saved?: string }>;
 }) {
-  // Check if user is logged in by verifying the auth_token cookie
+  // Protects the admin dashboard with the existing cookie login.
   const loggedIn = await isLoggedIn();
   const params = searchParams ? await searchParams : {};
 
-  // ===== UNAUTHENTICATED VIEW: Login Screen =====
+  // Login screen shown before the admin password is accepted.
   if (!loggedIn) {
     return (
       <main className={styles.loginBox}>
@@ -35,7 +35,7 @@ export default async function Home({
     );
   }
 
-  // ===== AUTHENTICATED VIEW: Admin Dashboard =====
+  // Dashboard summary uses the seeded frontend product catalogue.
   const activeProducts = adminProducts.filter((product) => product.active).length;
   const platformCount = new Set(
     adminProducts.flatMap((product) => product.platforms),
@@ -43,7 +43,7 @@ export default async function Home({
 
   return (
     <main className={styles.main}>
-      {/* Header section with title and action buttons */}
+      {/* Main admin actions for adding games and signing out. */}
       <div className={styles.header}>
         <div>
           <p className={styles.eyebrow}>GameHub Storefront</p>
@@ -55,7 +55,7 @@ export default async function Home({
         </div>
         <div className={styles.actions}>
           <a href="/products/create" className={styles.createBtn}>Add New Game</a>
-          {/* Logout uses the auth DELETE endpoint required by the assignment. */}
+          {/* Logout uses the auth DELETE endpoint from the original assignment. */}
           <LogoutButton className={styles.logoutBtn} />
         </div>
       </div>

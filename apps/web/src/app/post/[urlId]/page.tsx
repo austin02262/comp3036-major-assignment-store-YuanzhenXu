@@ -9,6 +9,7 @@ export default async function PostPage({
   params: Promise<{ urlId: string }>;
 }) {
   const { urlId } = await params;
+  // Loads both the full game record and the legacy Post adapter.
   const game = findGameByUrlId(urlId);
   const post = gamePosts.find((item) => item.urlId === urlId);
 

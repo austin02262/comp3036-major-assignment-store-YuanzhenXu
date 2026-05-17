@@ -9,6 +9,7 @@ export function HistoryList({
   selectedYear?: string;
   posts: Post[];
 }) {
+  // Release year links replace the original blog archive months.
   const historyItems = history(posts);
 
   if (historyItems.length === 0) return null;

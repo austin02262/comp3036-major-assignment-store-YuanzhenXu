@@ -1,6 +1,7 @@
 import type { Post } from "@repo/db/data";
 import type { StoreProduct } from "@/lib/storeProducts";
 
+// Frontend product catalogue used before the real product database is connected.
 export const gameCatalog: StoreProduct[] = [
   {
     id: 101,
@@ -174,6 +175,7 @@ export const gameCatalog: StoreProduct[] = [
   },
 ];
 
+// Adapts game products to the old blog Post shape so existing pages can be reused.
 export const gamePosts: Post[] = gameCatalog.map((game) => ({
   id: game.id,
   urlId: game.urlId,
@@ -189,6 +191,7 @@ export const gamePosts: Post[] = gameCatalog.map((game) => ({
   active: true,
 }));
 
+// Finds the full game record for the detail page.
 export function findGameByUrlId(urlId: string) {
   return gameCatalog.find((game) => game.urlId === urlId);
 }

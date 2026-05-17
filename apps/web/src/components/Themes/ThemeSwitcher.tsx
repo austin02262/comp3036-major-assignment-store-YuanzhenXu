@@ -3,6 +3,7 @@
 import { useTheme } from "@/components/Themes/ThemeContext";
 
 export default function ThemeSwitch() {
+  // Toggles the storefront between light and dark modes.
   const { theme, toggleTheme } = useTheme();
 
   return (

@@ -12,6 +12,7 @@ export default async function TagPage({
   const posts = await getPublicPosts();
 
   const filteredPosts = posts.filter((post) => {
+    // Platform names are slugged so URLs stay readable.
     const tags = post.tags
       .split(",")
       .map((value) => value.trim().toLowerCase().replace(/\s+/g, "-"));

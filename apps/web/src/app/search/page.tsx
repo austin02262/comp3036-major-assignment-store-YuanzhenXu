@@ -15,6 +15,7 @@ export default async function SearchPage({
   const query = q?.trim().toLowerCase() || "";
 
   const filteredPosts = posts.filter(post => {
+    // Search matches exact title words, release year, genre, or platform.
     if (!query) return true;
 
     const titleWords = post.title

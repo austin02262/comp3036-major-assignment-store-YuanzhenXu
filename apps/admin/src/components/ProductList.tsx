@@ -33,6 +33,7 @@ export function ProductList({
   const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
+    // Loads any products created or edited during the admin demo.
     try {
       const savedProducts = window.localStorage.getItem(storageKey);
       if (savedProducts) {
@@ -54,6 +55,7 @@ export function ProductList({
 
   const filteredProducts = products
     .filter((product) => {
+      // Combines search, platform, genre, and availability filters.
       const normalizedQuery = query.trim().toLowerCase();
       const matchesQuery =
         normalizedQuery.length === 0 ||
@@ -86,6 +88,7 @@ export function ProductList({
     });
 
   const toggleProductState = (productId: number) => {
+    // Toggles whether a game is shown as available or out of stock.
     const nextProducts = products.map((product) =>
       product.id === productId ? { ...product, active: !product.active } : product,
     );

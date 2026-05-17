@@ -27,6 +27,7 @@ const platformOptions = ["Xbox", "PlayStation", "Nintendo Switch"];
 const genreOptions = ["Action", "Adventure", "FPS", "Racing", "RPG"];
 
 function slugify(title: string) {
+  // Creates a URL-safe id for newly added games.
   return title
     .toLowerCase()
     .trim()
@@ -35,6 +36,7 @@ function slugify(title: string) {
 }
 
 function readProducts() {
+  // Admin changes stay in localStorage until the backend product API is connected.
   if (typeof window === "undefined") {
     return adminProducts;
   }
@@ -50,6 +52,7 @@ function readProducts() {
 }
 
 function toDateInputValue(dateValue?: string) {
+  // Converts display dates into the yyyy-mm-dd format required by date inputs.
   if (!dateValue) {
     return "";
   }
@@ -63,6 +66,7 @@ function toDateInputValue(dateValue?: string) {
 }
 
 function formatReleaseDate(dateValue: string) {
+  // Stores release dates in the same readable format as the storefront.
   const date = new Date(`${dateValue}T00:00:00`);
 
   return new Intl.DateTimeFormat("en-AU", {
@@ -73,6 +77,7 @@ function formatReleaseDate(dateValue: string) {
 }
 
 function getReleaseYear(dateValue: string) {
+  // Release year is derived from the full date, so admins enter it only once.
   return new Date(`${dateValue}T00:00:00`).getFullYear();
 }
 
@@ -123,11 +128,13 @@ export function ProductForm({
   }, [isEditing, lookupUrlId]);
 
   const updateFormData = (nextData: Partial<ProductFormData>) => {
+    // Central state update helper for all product form fields.
     setSubmitSuccess("");
     setFormData((currentData) => ({ ...currentData, ...nextData }));
   };
 
   const togglePlatform = (platform: string) => {
+    // Allows one game to appear on multiple console platforms.
     updateFormData({
       platforms: formData.platforms.includes(platform)
         ? formData.platforms.filter((item) => item !== platform)
@@ -139,6 +146,7 @@ export function ProductForm({
     file: File,
     onLoad: (imageUrl: string) => void,
   ) => {
+    // Reads local uploads as data URLs for the frontend demo preview.
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
@@ -160,6 +168,7 @@ export function ProductForm({
   };
 
   const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Gallery is capped at three images to match the product detail layout.
     const files = Array.from(event.target.files || []).slice(
       0,
       3 - formData.galleryImages.length,
@@ -182,6 +191,7 @@ export function ProductForm({
   };
 
   const validate = () => {
+    // Basic client-side validation keeps the demo form from saving empty games.
     const nextErrors: Record<string, string> = {};
     const price = Number(formData.price);
 
@@ -206,6 +216,7 @@ export function ProductForm({
   };
 
   const handleSubmit = (event: React.FormEvent) => {
+    // Saves a new or edited game to localStorage and returns to the dashboard.
     event.preventDefault();
 
     if (!validate()) {

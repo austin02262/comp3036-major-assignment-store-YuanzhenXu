@@ -7,6 +7,7 @@ export default async function CheckoutSuccessRoute({
 }) {
   const { order } = await searchParams;
 
+  // Confirmation page displays the mock order id from checkout.
   return (
     <AppLayout>
       <div className="mx-auto max-w-2xl rounded-lg bg-white p-8 text-center shadow-md">

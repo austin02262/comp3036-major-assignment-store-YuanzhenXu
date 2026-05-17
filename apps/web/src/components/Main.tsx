@@ -1,5 +1,5 @@
 import type { Post } from "@repo/db/data";
-import { BlogList } from "./Blog/List"; 
+import { BlogList } from "./Blog/List";
 
 export function Main({
   posts,
@@ -8,9 +8,9 @@ export function Main({
   posts: Post[];
   className?: string;
 }) {
-  // ✅ 只显示 active 的文章
-  const activePosts = posts.filter(post => post.active);
-  
+  // Only active games appear on the customer storefront.
+  const activePosts = posts.filter((post) => post.active);
+
   return (
     <main className={className}>
       <BlogList posts={activePosts} />

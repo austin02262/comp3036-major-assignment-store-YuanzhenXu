@@ -14,6 +14,7 @@ export type AdminProduct = {
   active: boolean;
 };
 
+// Admin-side product seed data for the frontend prototype.
 export const adminProducts: AdminProduct[] = [
   {
     id: 101,

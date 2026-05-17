@@ -20,10 +20,12 @@ export type StoreProduct = {
 
 const platforms = ["PC", "PlayStation", "Xbox", "Nintendo Switch"];
 
+// Keeps generated product names tidy when legacy post data is used.
 export function cleanProductTitle(title: string): string {
   return title.replace(/[!,]/g, "").replace(/\s+/g, " ").trim();
 }
 
+// Central price formatter for all storefront UI.
 export function formatPrice(price: number): string {
   return new Intl.NumberFormat("en-AU", {
     style: "currency",
@@ -31,6 +33,7 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
+// Converts legacy Post data into store product data for reusable components.
 export function postToProduct(post: Post): StoreProduct {
   const existingProduct = gameCatalog.find((game) => game.id === post.id);
 
@@ -38,6 +41,7 @@ export function postToProduct(post: Post): StoreProduct {
     return existingProduct;
   }
 
+  // Fallback keeps old seeded posts renderable during the frontend transition.
   const tags = post.tags
     .split(",")
     .map((tag) => tag.trim())

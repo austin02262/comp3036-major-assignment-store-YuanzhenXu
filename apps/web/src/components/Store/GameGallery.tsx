@@ -14,12 +14,14 @@ export function GameGallery({
   const selectedImage = selectedIndex === null ? null : images[selectedIndex];
 
   const showPrevious = () => {
+    // Wraps around so users can browse all gallery images in one modal.
     setSelectedIndex((currentIndex) =>
       currentIndex === null ? 0 : (currentIndex - 1 + images.length) % images.length,
     );
   };
 
   const showNext = () => {
+    // Moves to the next gameplay image without closing the modal.
     setSelectedIndex((currentIndex) =>
       currentIndex === null ? 0 : (currentIndex + 1) % images.length,
     );
@@ -71,7 +73,7 @@ export function GameGallery({
               className="absolute left-0 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-3xl font-black text-gray-950 shadow-lg transition hover:bg-white"
               onClick={showPrevious}
             >
-              ‹
+              &lt;
             </button>
             <button
               type="button"
@@ -79,7 +81,7 @@ export function GameGallery({
               className="absolute right-0 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-3xl font-black text-gray-950 shadow-lg transition hover:bg-white"
               onClick={showNext}
             >
-              ›
+              &gt;
             </button>
             <GameImage
               src={selectedImage}

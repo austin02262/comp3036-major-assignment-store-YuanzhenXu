@@ -8,14 +8,14 @@ interface PageProps {
 }
 
 export default async function EditProductPage({ params }: PageProps) {
-  // Check authentication - redirect to home (login) if not logged in
+  // Only signed-in admins can edit games.
   const loggedIn = await isLoggedIn();
   
   if (!loggedIn) {
     redirect('/');
   }
 
-  // Extract urlId from the dynamic route parameters
+  // The urlId chooses which product opens in the edit form.
   const { urlId } = await params;
 
   const product = adminProducts.find((item) => item.urlId === urlId);
