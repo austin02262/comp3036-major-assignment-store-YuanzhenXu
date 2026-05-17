@@ -11,6 +11,7 @@ type CartItem = StoreProduct & {
 };
 
 function readCart(): CartItem[] {
+  // Keeps the cart preview synced with localStorage.
   try {
     return JSON.parse(window.localStorage.getItem(cartKey) || "[]") as CartItem[];
   } catch {
@@ -19,6 +20,7 @@ function readCart(): CartItem[] {
 }
 
 function saveCart(items: CartItem[]) {
+  // Persists quantity/remove changes from the mini cart.
   window.localStorage.setItem(cartKey, JSON.stringify(items));
   window.dispatchEvent(new Event("gamehub-cart-updated"));
 }
@@ -46,6 +48,7 @@ export function CartPreview({ cartCount }: { cartCount: number }) {
   );
 
   const updateQuantity = (id: number, quantity: number) => {
+    // Quantity 0 is treated as removing the item.
     const nextItems = items
       .map((item) => (item.id === id ? { ...item, quantity } : item))
       .filter((item) => item.quantity > 0);
@@ -55,6 +58,7 @@ export function CartPreview({ cartCount }: { cartCount: number }) {
   };
 
   const removeItem = (id: number) => {
+    // Removes one product from the cart preview.
     const nextItems = items.filter((item) => item.id !== id);
     setItems(nextItems);
     saveCart(nextItems);

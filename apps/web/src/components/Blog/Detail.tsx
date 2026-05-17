@@ -11,6 +11,7 @@ export function BlogDetail({
   likes: number;
   liked: boolean;
 }) {
+  // Reuses the old blog detail route as a product detail page.
   const product = postToProduct(post);
 
   return (

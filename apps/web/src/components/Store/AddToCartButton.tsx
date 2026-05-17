@@ -10,6 +10,7 @@ type CartItem = StoreProduct & {
 };
 
 function readCart(): CartItem[] {
+  // Reads the browser cart used by the frontend-only prototype.
   if (typeof window === "undefined") return [];
 
   try {
@@ -20,6 +21,7 @@ function readCart(): CartItem[] {
 }
 
 function writeCart(items: CartItem[]) {
+  // Broadcasts a custom event so the navbar cart count updates immediately.
   window.localStorage.setItem(cartKey, JSON.stringify(items));
   window.dispatchEvent(new Event("gamehub-cart-updated"));
 }
@@ -35,6 +37,7 @@ export function AddToCartButton({ product }: { product: StoreProduct }) {
   }, [message]);
 
   const addToCart = () => {
+    // Adds a new game or increases quantity when it already exists.
     const cart = readCart();
     const existingItem = cart.find((item) => item.id === product.id);
 

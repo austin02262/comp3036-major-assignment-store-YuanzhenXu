@@ -4,11 +4,12 @@ interface HistoryStats {
 }
 
 export function history(posts: { date: Date; active: boolean }[]): HistoryStats[] {
+  // Groups active games by release year for the sidebar filter.
   const map = new Map<number, number>();
 
   for (const { date, active } of posts) {
-    if (!active) continue;                // skip those which are inactive
-    const year = date.getFullYear();      
+    if (!active) continue;
+    const year = date.getFullYear();
     map.set(year, (map.get(year) || 0) + 1);
   }
 

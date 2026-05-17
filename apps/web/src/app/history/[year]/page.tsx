@@ -11,6 +11,7 @@ export default async function ReleaseYearPage({
   const yearNum = parseInt(year, 10);
   const posts = await getPublicPosts();
 
+  // Shows only games released in the selected year.
   const filteredPosts = posts.filter(
     (post) => post.date.getFullYear() === yearNum,
   );

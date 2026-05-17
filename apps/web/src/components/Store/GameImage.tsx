@@ -16,6 +16,7 @@ export function GameImage({
   const [failed, setFailed] = useState(false);
 
   if (failed || !src) {
+    // Fallback keeps the UI readable if a game image is missing.
     return (
       <div
         role="img"

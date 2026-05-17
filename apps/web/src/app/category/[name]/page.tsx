@@ -11,6 +11,7 @@ export default async function CategoryPage({
   const categoryName = decodeURIComponent(name);
   const posts = await getPublicPosts();
 
+  // Filters games by genre from the sidebar links.
   const filteredPosts = posts.filter(
     post => post.category.toLowerCase() === categoryName.toLowerCase()
   );

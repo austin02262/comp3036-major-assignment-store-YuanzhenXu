@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 
 export default async function CreateProductPage() {
-  // Check authentication - redirect to home (login) if not logged in
+  // Only signed-in admins can add new games.
   const loggedIn = await isLoggedIn();
   
   if (!loggedIn) {

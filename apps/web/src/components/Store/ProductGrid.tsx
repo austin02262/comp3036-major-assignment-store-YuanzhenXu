@@ -20,6 +20,7 @@ export function ProductGrid({ posts }: { posts: Post[] }) {
   const [sortMode, setSortMode] = useState<SortMode>("default");
 
   const sortedPosts = useMemo(() => {
+    // Sorts the catalogue by release date or price without changing source data.
     const nextPosts = [...posts];
 
     if (sortMode === "date-desc") {

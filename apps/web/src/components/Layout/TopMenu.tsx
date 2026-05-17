@@ -8,6 +8,7 @@ import ThemeSwitch from "@/components/Themes/ThemeSwitcher";
 const cartKey = "gamehub-cart";
 
 function getCartCount() {
+  // Calculates total quantity, not just unique products.
   if (typeof window === "undefined") return 0;
 
   try {
@@ -25,6 +26,7 @@ export function TopMenu({ query = "" }: { query?: string }) {
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
+    // Updates the cart badge after add/remove actions in other components.
     const updateCount = () => setCartCount(getCartCount());
 
     updateCount();
@@ -38,6 +40,7 @@ export function TopMenu({ query = "" }: { query?: string }) {
   }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Routes search text into the existing search page.
     const search = event.target.value;
     router.push(`/search?q=${search}`);
   };

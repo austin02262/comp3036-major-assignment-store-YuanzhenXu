@@ -4,6 +4,7 @@ import { HistoryList } from "./HistoryList";
 import { TagList } from "./TagList";  
 
 export async function LeftMenu() {
+  // Shared storefront filters reuse the blog sidebar structure.
   const posts = await getPublicPosts();
 
   return (
@@ -19,7 +20,7 @@ export async function LeftMenu() {
       </a>
       <CategoryList posts={posts} />
       <HistoryList posts={posts} />
-      <TagList posts={posts} />  {/* left menu only has three parts: Category/history/Tag */}
+      <TagList posts={posts} />
     </div>
   );
 }

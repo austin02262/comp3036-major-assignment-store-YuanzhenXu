@@ -24,6 +24,7 @@ type Purchase = {
 };
 
 function readCart(): CartItem[] {
+  // Loads selected products for the combined cart and checkout page.
   try {
     return JSON.parse(window.localStorage.getItem(cartKey) || "[]") as CartItem[];
   } catch {
@@ -32,11 +33,13 @@ function readCart(): CartItem[] {
 }
 
 function saveCart(items: CartItem[]) {
+  // Saves cart edits made directly on the checkout page.
   window.localStorage.setItem(cartKey, JSON.stringify(items));
   window.dispatchEvent(new Event("gamehub-cart-updated"));
 }
 
 function readPurchases(): Purchase[] {
+  // Purchase history is mocked in the browser until backend orders are added.
   try {
     return JSON.parse(window.localStorage.getItem(purchasesKey) || "[]") as Purchase[];
   } catch {
@@ -81,6 +84,7 @@ export function CheckoutPage() {
   };
 
   const completePurchase = (event: React.FormEvent) => {
+    // Creates a mock order, clears the cart, and sends the user to success.
     event.preventDefault();
 
     if (items.length === 0) {
@@ -293,6 +297,7 @@ function Field({
   type?: string;
   placeholder?: string;
 }) {
+  // Small shared field component keeps checkout form markup consistent.
   const id = label.toLowerCase().replace(/\s+/g, "-");
 
   return (

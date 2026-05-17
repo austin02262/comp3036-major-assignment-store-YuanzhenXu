@@ -1,6 +1,7 @@
 export function categories<T>(
   posts: { category: string; active: boolean }[],
 ): { name: string; count: number }[] {
+  // Builds genre filter counts for the left sidebar.
   const result = posts
     .filter((p) => p.active)
     .reduce(

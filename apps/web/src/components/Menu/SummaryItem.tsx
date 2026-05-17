@@ -11,6 +11,7 @@ export function SummaryItem({
   isSelected: boolean;
   title?: string;
 }) {
+  // Reusable row for sidebar filters with a count badge.
   const displayTitle = title || `${name} (${count})`;
   
   return (
