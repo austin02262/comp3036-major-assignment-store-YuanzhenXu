@@ -158,7 +158,7 @@ export const gameCatalog: StoreProduct[] = [
     description:
       "A sci-fi open-world RPG set in Night City, with first-person combat, hacking, vehicles, branching missions, and cinematic storytelling.",
     content:
-      "Cyberpunk 2077 adds a neon sci-fi RPG to the catalogue. Its strong visual identity helps the frontend feel more like a real game storefront rather than a blog layout.",
+      "Cyberpunk 2077 adds a neon sci-fi RPG to the catalogue. Its strong visual identity helps the frontend feel like a real game storefront.",
     imageUrl: "/games/cyberpunk_header.jpg",
     screenshots: [
       "/games/cyberpunk1.jpg",
@@ -175,7 +175,7 @@ export const gameCatalog: StoreProduct[] = [
   },
 ];
 
-// Adapts game products to the old blog Post shape so existing pages can be reused.
+// Adapts game products to the shared Post-shaped data type used by this starter code.
 export const gamePosts: Post[] = gameCatalog.map((game) => ({
   id: game.id,
   urlId: game.urlId,
@@ -185,8 +185,8 @@ export const gamePosts: Post[] = gameCatalog.map((game) => ({
   imageUrl: game.imageUrl,
   date: new Date(game.releaseDate),
   category: game.category,
-  views: 0,
-  likes: 0,
+  views: 0, // Compatibility field from the original Post type; not shown in UI.
+  likes: 0, // Compatibility field from the original Post type; like feature was removed.
   tags: game.platforms.join(","),
   active: true,
 }));

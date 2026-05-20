@@ -1,11 +1,11 @@
-import { getPublicPosts } from "@/functions/posts";
+import { getPublicGames } from "@/functions/games";
 import { CategoryList } from "./CategoryList";
 import { HistoryList } from "./HistoryList";
 import { TagList } from "./TagList";  
 
 export async function LeftMenu() {
-  // Shared storefront filters reuse the blog sidebar structure.
-  const posts = await getPublicPosts();
+  // Shared storefront filters for genre, release year, and platform.
+  const posts = await getPublicGames();
 
   return (
     <div className="space-y-4 text-[var(--text)]">
@@ -14,9 +14,6 @@ export async function LeftMenu() {
           Filter Console Games
         </p>
         <p className="mt-2 text-2xl font-black tracking-tight">Find Your Next Play</p>
-        <p className="mt-2 text-sm leading-6 text-blue-100">
-          Narrow the catalogue by genre, release year, or platform.
-        </p>
       </a>
       <CategoryList posts={posts} />
       <HistoryList posts={posts} />

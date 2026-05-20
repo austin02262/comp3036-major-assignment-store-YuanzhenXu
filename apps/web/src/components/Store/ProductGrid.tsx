@@ -77,10 +77,10 @@ export function ProductGrid({ posts }: { posts: Post[] }) {
           return (
             <article
               key={post.id}
-              data-test-id={`blog-post-${post.id}`}
+              data-test-id={`game-card-${post.id}`}
               className="group overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-gray-950/10 dark:border-white/10 dark:bg-gray-950/80"
             >
-              <a href={`/post/${product.urlId}`} className="relative block aspect-[16/10] bg-gray-950">
+              <a href={`/games/${product.urlId}`} className="relative block aspect-[16/10] bg-gray-950">
                 <GameImage
                   src={product.imageUrl}
                   alt={product.title}
@@ -111,7 +111,7 @@ export function ProductGrid({ posts }: { posts: Post[] }) {
                 </div>
 
                 <a
-                  href={`/post/${product.urlId}`}
+                  href={`/games/${product.urlId}`}
                   className="mt-4 block min-h-14 text-xl font-black leading-tight text-gray-950 transition hover:text-blue-700 dark:text-white dark:hover:text-blue-300"
                 >
                   {product.title}

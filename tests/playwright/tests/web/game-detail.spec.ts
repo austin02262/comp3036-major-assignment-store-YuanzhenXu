@@ -2,7 +2,7 @@ import { expect, test } from "./fixtures";
 
 test.describe("CUSTOMER GAME DETAIL", () => {
   test("shows product detail and opens gameplay gallery", { tag: "@a1" }, async ({ page }) => {
-    await page.goto("/post/god-of-war-ragnarok");
+    await page.goto("/games/god-of-war-ragnarok");
 
     await expect(page.getByRole("heading", { name: "God of War Ragnarok" })).toBeVisible();
     await expect(page.getByText("About This Game")).toBeVisible();

@@ -213,7 +213,7 @@ export function ProductList({
               </div>
               <div className={styles.cardActions}>
                 <a href={`/product/${product.urlId}`}>Edit product</a>
-                <a href={`http://localhost:3001/post/${product.urlId}`}>
+                <a href={`http://localhost:3001/games/${product.urlId}`}>
                   View storefront
                 </a>
                 <button

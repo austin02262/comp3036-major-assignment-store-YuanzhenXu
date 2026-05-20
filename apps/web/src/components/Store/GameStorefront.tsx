@@ -2,8 +2,8 @@ import type { Post } from "@repo/db/data";
 import { GameImage } from "@/components/Store/GameImage";
 import { ProductGrid } from "@/components/Store/ProductGrid";
 
-export function BlogList({ posts }: { posts: Post[] }) {
-  // Home page now presents the blog list as a game storefront catalogue.
+export function GameStorefront({ posts }: { posts: Post[] }) {
+  // Home page presents the game storefront catalogue.
   if (posts.length === 0) {
     return (
       <div className="rounded-lg border border-gray-800 bg-gray-950 py-16 text-center text-gray-300">

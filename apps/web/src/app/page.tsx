@@ -1,10 +1,10 @@
 import { AppLayout } from "../components/Layout/AppLayout";
 import { Main } from "../components/Main";
-import { getPublicPosts } from "../functions/posts";
+import { getPublicGames } from "../functions/games";
 import styles from "./page.module.css";
 
 export default async function Home() {
-  const posts = await getPublicPosts();
+  const posts = await getPublicGames();
 
   return (
     <AppLayout>
