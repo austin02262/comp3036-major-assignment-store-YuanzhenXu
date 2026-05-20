@@ -9,7 +9,7 @@ export function HistoryList({
   selectedYear?: string;
   posts: Post[];
 }) {
-  // Release year links replace the original blog archive months.
+  // Release year links group games by launch year.
   const historyItems = history(posts);
 
   if (historyItems.length === 0) return null;

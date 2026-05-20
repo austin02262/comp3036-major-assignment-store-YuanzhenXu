@@ -47,6 +47,7 @@ test.describe("ADMIN PRODUCT MANAGEMENT", () => {
     await expect(page.getByLabel("Price")).toHaveValue("59.95");
 
     await page.getByLabel("Price").fill("69.95");
+    await expect(page.getByLabel("Price")).toHaveValue("69.95");
     await page.getByLabel("Store description").fill("Updated Halo product description.");
     await page.getByRole("button", { name: "Save Game" }).click();
 

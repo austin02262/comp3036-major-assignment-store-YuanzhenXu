@@ -37,9 +37,6 @@ export default async function Home({
 
   // Dashboard summary uses the seeded frontend product catalogue.
   const activeProducts = adminProducts.filter((product) => product.active).length;
-  const platformCount = new Set(
-    adminProducts.flatMap((product) => product.platforms),
-  ).size;
 
   return (
     <main className={styles.main}>
@@ -68,10 +65,6 @@ export default async function Home({
         <article>
           <span>Available products</span>
           <strong>{activeProducts}</strong>
-        </article>
-        <article>
-          <span>Platforms</span>
-          <strong>{platformCount}</strong>
         </article>
       </section>
 

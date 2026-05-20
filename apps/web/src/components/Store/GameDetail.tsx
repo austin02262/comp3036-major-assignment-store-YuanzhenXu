@@ -4,18 +4,16 @@ import { GameGallery } from "@/components/Store/GameGallery";
 import { GameImage } from "@/components/Store/GameImage";
 import { formatPrice, postToProduct } from "@/lib/storeProducts";
 
-export function BlogDetail({
+export function GameDetail({
   post,
 }: {
   post: Post;
-  likes: number;
-  liked: boolean;
 }) {
-  // Reuses the old blog detail route as a product detail page.
+  // Renders one selected game as a product detail page.
   const product = postToProduct(post);
 
   return (
-    <article data-test-id={`blog-post-${post.id}`} className="space-y-8">
+    <article data-test-id={`game-detail-${post.id}`} className="space-y-8">
       <section className="relative overflow-hidden rounded-2xl bg-gray-950 text-white shadow-2xl shadow-gray-950/15">
         <GameImage
           src={product.imageUrl}

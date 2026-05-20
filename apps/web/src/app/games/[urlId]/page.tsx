@@ -1,9 +1,9 @@
 import { findGameByUrlId, gamePosts } from "@/data/gameCatalog";
 import { AppLayout } from "@/components/Layout/AppLayout";
-import { BlogDetail } from "@/components/Blog/Detail";
+import { GameDetail } from "@/components/Store/GameDetail";
 import { notFound } from "next/navigation";
 
-export default async function PostPage({
+export default async function GamePage({
   params,
 }: {
   params: Promise<{ urlId: string }>;
@@ -20,7 +20,7 @@ export default async function PostPage({
   return (
     <AppLayout>
       <div className="mx-auto max-w-5xl">
-        <BlogDetail post={post} likes={0} liked={false} />
+        <GameDetail post={post} />
       </div>
     </AppLayout>
   );

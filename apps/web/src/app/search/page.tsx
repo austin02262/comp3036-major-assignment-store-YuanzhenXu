@@ -1,7 +1,7 @@
 // app/search/page.tsx
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { Main } from "@/components/Main";
-import { getPublicPosts } from "@/functions/posts";
+import { getPublicGames } from "@/functions/games";
 
 export default async function SearchPage({
   searchParams,
@@ -10,7 +10,7 @@ export default async function SearchPage({
 }) {
   
   const { q } = await searchParams;
-  const posts = await getPublicPosts();
+  const posts = await getPublicGames();
 
   const query = q?.trim().toLowerCase() || "";
 

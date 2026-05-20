@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { Main } from "@/components/Main";
-import { getPublicPosts } from "@/functions/posts";
+import { getPublicGames } from "@/functions/games";
 
 export default async function CategoryPage({ 
   params 
@@ -9,7 +9,7 @@ export default async function CategoryPage({
 }) {
   const { name } = await params;
   const categoryName = decodeURIComponent(name);
-  const posts = await getPublicPosts();
+  const posts = await getPublicGames();
 
   // Filters games by genre from the sidebar links.
   const filteredPosts = posts.filter(

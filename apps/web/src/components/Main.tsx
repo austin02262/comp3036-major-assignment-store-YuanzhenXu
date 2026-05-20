@@ -1,5 +1,5 @@
 import type { Post } from "@repo/db/data";
-import { BlogList } from "./Blog/List";
+import { GameStorefront } from "./Store/GameStorefront";
 
 export function Main({
   posts,
@@ -13,7 +13,7 @@ export function Main({
 
   return (
     <main className={className}>
-      <BlogList posts={activePosts} />
+      <GameStorefront posts={activePosts} />
     </main>
   );
 }
