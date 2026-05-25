@@ -5,7 +5,7 @@ import { TagList } from "./TagList";
 
 export async function LeftMenu() {
   // Shared storefront filters for genre, release year, and platform.
-  const posts = await getPublicGames();
+  const products = await getPublicGames();
 
   return (
     <div className="space-y-4 text-[var(--text)]">
@@ -15,9 +15,9 @@ export async function LeftMenu() {
         </p>
         <p className="mt-2 text-2xl font-black tracking-tight">Find Your Next Play</p>
       </a>
-      <CategoryList posts={posts} />
-      <HistoryList posts={posts} />
-      <TagList posts={posts} />
+      <CategoryList products={products} />
+      <HistoryList products={products} />
+      <TagList products={products} />
     </div>
   );
 }

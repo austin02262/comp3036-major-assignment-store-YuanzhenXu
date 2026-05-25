@@ -87,13 +87,19 @@ export function ProductList({
       }
     });
 
-  const toggleProductState = (productId: number) => {
-    // Toggles whether a game is shown as available or out of stock.
+  const toggleProductState = async (productId: number) => {
+    // Toggles local UI first, then mirrors the status change to the product API.
     const nextProducts = products.map((product) =>
       product.id === productId ? { ...product, active: !product.active } : product,
     );
     setProducts(nextProducts);
     window.localStorage.setItem(storageKey, JSON.stringify(nextProducts));
+
+    try {
+      await fetch(`/api/products/${productId}`, { method: "PATCH" });
+    } catch {
+      // LocalStorage keeps the admin demo usable if the API is unavailable.
+    }
 
     const product = products.find((item) => item.id === productId);
     if (product) {

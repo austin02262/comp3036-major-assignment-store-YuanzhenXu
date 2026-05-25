@@ -82,7 +82,7 @@
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -111,6 +111,62 @@
   font-weight: 900;
 }
 
+.orders {
+  margin-bottom: 24px;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.ordersHeader,
+.orderCard {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.ordersHeader {
+  margin-bottom: 16px;
+}
+
+.ordersHeader h2 {
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.ordersHeader span,
+.orderCard span,
+.orderCard p,
+.emptyOrders {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.orderList {
+  display: grid;
+  gap: 12px;
+}
+
+.orderCard {
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.orderCard strong {
+  display: block;
+  color: #07111f;
+  font-weight: 900;
+}
+
+.orderCard p {
+  margin-top: 5px;
+}
+
 .loginBox {
   max-width: 420px;
   margin: 100px auto;
@@ -132,6 +188,10 @@
 
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .orderCard {
+    display: grid;
   }
 }
 

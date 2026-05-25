@@ -26,7 +26,7 @@ export function SummaryItem({
     >
       <span className="truncate">{name}</span>
       <span 
-        data-test-id="post-count"
+        data-test-id="filter-count"
         className={`ml-2 shrink-0 rounded-full px-2 py-0.5 text-xs ${
           isSelected
             ? "bg-white/20 text-white"

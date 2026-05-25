@@ -9,16 +9,16 @@ export default async function ReleaseYearPage({
 }) {
   const { year } = await params;
   const yearNum = parseInt(year, 10);
-  const posts = await getPublicGames();
+  const products = await getPublicGames();
 
   // Shows only games released in the selected year.
-  const filteredPosts = posts.filter(
-    (post) => post.date.getFullYear() === yearNum,
+  const filteredProducts = products.filter(
+    (product) => product.releaseYear === yearNum,
   );
 
   return (
     <AppLayout>
-      <Main posts={filteredPosts} />
+      <Main products={filteredProducts} />
     </AppLayout>
   );
 }

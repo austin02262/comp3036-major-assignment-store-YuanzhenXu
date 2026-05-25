@@ -1,10 +1,10 @@
-import type { Post } from "@repo/db/data";
 import { GameImage } from "@/components/Store/GameImage";
 import { ProductGrid } from "@/components/Store/ProductGrid";
+import type { StoreProduct } from "@/lib/storeProducts";
 
-export function GameStorefront({ posts }: { posts: Post[] }) {
+export function GameStorefront({ products }: { products: StoreProduct[] }) {
   // Home page presents the game storefront catalogue.
-  if (posts.length === 0) {
+  if (products.length === 0) {
     return (
       <div className="rounded-lg border border-gray-800 bg-gray-950 py-16 text-center text-gray-300">
         0 Games
@@ -44,7 +44,7 @@ export function GameStorefront({ posts }: { posts: Post[] }) {
         </div>
       </section>
 
-      <ProductGrid posts={posts} />
+      <ProductGrid products={products} />
     </div>
   );
 }

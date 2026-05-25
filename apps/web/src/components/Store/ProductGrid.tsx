@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Post } from "@repo/db/data";
 import { AddToCartButton } from "@/components/Store/AddToCartButton";
 import { GameImage } from "@/components/Store/GameImage";
-import { formatPrice, postToProduct } from "@/lib/storeProducts";
+import { formatPrice, type StoreProduct } from "@/lib/storeProducts";
 
 type SortMode = "default" | "date-desc" | "date-asc" | "price-asc" | "price-desc";
 
@@ -16,31 +15,31 @@ const sortOptions: { value: SortMode; label: string }[] = [
   { value: "price-desc", label: "Price High to Low" },
 ];
 
-export function ProductGrid({ posts }: { posts: Post[] }) {
+export function ProductGrid({ products }: { products: StoreProduct[] }) {
   const [sortMode, setSortMode] = useState<SortMode>("default");
 
-  const sortedPosts = useMemo(() => {
+  const sortedProducts = useMemo(() => {
     // Sorts the catalogue by release date or price without changing source data.
-    const nextPosts = [...posts];
+    const nextProducts = [...products];
 
     if (sortMode === "date-desc") {
-      nextPosts.sort((a, b) => b.date.getTime() - a.date.getTime());
+      nextProducts.sort((a, b) => b.releaseYear - a.releaseYear);
     }
 
     if (sortMode === "date-asc") {
-      nextPosts.sort((a, b) => a.date.getTime() - b.date.getTime());
+      nextProducts.sort((a, b) => a.releaseYear - b.releaseYear);
     }
 
     if (sortMode === "price-asc") {
-      nextPosts.sort((a, b) => postToProduct(a).price - postToProduct(b).price);
+      nextProducts.sort((a, b) => a.price - b.price);
     }
 
     if (sortMode === "price-desc") {
-      nextPosts.sort((a, b) => postToProduct(b).price - postToProduct(a).price);
+      nextProducts.sort((a, b) => b.price - a.price);
     }
 
-    return nextPosts;
-  }, [posts, sortMode]);
+    return nextProducts;
+  }, [products, sortMode]);
 
   return (
     <section id="catalogue" className="space-y-6">
@@ -48,7 +47,7 @@ export function ProductGrid({ posts }: { posts: Post[] }) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-normal tracking-tight text-gray-950 dark:text-white">
-              Video Games <span className="text-base text-gray-500">{posts.length} items</span>
+              Video Games <span className="text-base text-gray-500">{products.length} items</span>
             </h2>
           </div>
 
@@ -71,13 +70,11 @@ export function ProductGrid({ posts }: { posts: Post[] }) {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        {sortedPosts.map((post) => {
-          const product = postToProduct(post);
-
+        {sortedProducts.map((product) => {
           return (
             <article
-              key={post.id}
-              data-test-id={`game-card-${post.id}`}
+              key={product.id}
+              data-test-id={`game-card-${product.id}`}
               className="group overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl hover:shadow-gray-950/10 dark:border-white/10 dark:bg-gray-950/80"
             >
               <a href={`/games/${product.urlId}`} className="relative block aspect-[16/10] bg-gray-950">
