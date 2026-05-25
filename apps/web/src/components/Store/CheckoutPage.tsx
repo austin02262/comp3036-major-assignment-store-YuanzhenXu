@@ -39,12 +39,36 @@ function saveCart(items: CartItem[]) {
 }
 
 function readPurchases(): Purchase[] {
-  // Purchase history is mocked in the browser until backend orders are added.
+  // Browser purchase history remains as a fallback for the frontend demo.
   try {
     return JSON.parse(window.localStorage.getItem(purchasesKey) || "[]") as Purchase[];
   } catch {
     return [];
   }
+}
+
+function apiPurchaseToLocalPurchase(
+  apiPurchase: {
+    id: string;
+    total: number;
+    createdAt: string;
+  },
+  customerName: string,
+  email: string,
+  phone: string,
+  address: string,
+  items: CartItem[],
+): Purchase {
+  return {
+    id: apiPurchase.id,
+    customerName,
+    email,
+    phone,
+    address,
+    total: apiPurchase.total,
+    createdAt: apiPurchase.createdAt,
+    items,
+  };
 }
 
 export function CheckoutPage() {
@@ -83,8 +107,8 @@ export function CheckoutPage() {
     saveCart(nextItems);
   };
 
-  const completePurchase = (event: React.FormEvent) => {
-    // Creates a mock order, clears the cart, and sends the user to success.
+  const completePurchase = async (event: React.FormEvent) => {
+    // Creates an order through the API, then clears the cart on success.
     event.preventDefault();
 
     if (items.length === 0) {
@@ -105,16 +129,57 @@ export function CheckoutPage() {
       return;
     }
 
-    const purchase: Purchase = {
-      id: `GH-${Date.now()}`,
-      customerName: `${firstName} ${lastName}`,
-      email,
-      phone,
-      address: `${address}, ${postcode}`,
-      total,
-      createdAt: new Date().toISOString(),
-      items,
-    };
+    const customerName = `${firstName} ${lastName}`;
+    const deliveryAddress = `${address}, ${postcode}`;
+    let purchase: Purchase | undefined;
+
+    try {
+      const response = await fetch("/api/purchases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          phone,
+          address,
+          postcode,
+          items: items.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Purchase API failed");
+      }
+
+      const apiPurchase = (await response.json()) as {
+        id: string;
+        total: number;
+        createdAt: string;
+      };
+      purchase = apiPurchaseToLocalPurchase(
+        apiPurchase,
+        customerName,
+        email,
+        phone,
+        deliveryAddress,
+        items,
+      );
+    } catch {
+      purchase = {
+        id: `GH-${Date.now()}`,
+        customerName,
+        email,
+        phone,
+        address: deliveryAddress,
+        total,
+        createdAt: new Date().toISOString(),
+        items,
+      };
+    }
 
     window.localStorage.setItem(
       purchasesKey,

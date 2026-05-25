@@ -1,24 +1,21 @@
 import { expect, test } from "vitest";
 import { tags } from "./tags";
 
-test("returns empty array if no posts are provides", async () => {
-  await expect(await tags([])).toEqual([]);
+test("returns empty array if no products are provided", async () => {
+  expect(tags([])).toEqual([]);
 });
 
-test("returns tags with count", async () => {
-  await expect(
-    await tags([
-      { tags: "A,B", active: true },
-      { tags: "A,C", active: true },
-      { tags: "C", active: true },
-      {
-        tags: "D",
-        active: false,
-      },
+test("returns platform counts", async () => {
+  expect(
+    tags([
+      { platforms: ["Xbox", "PlayStation"], active: true },
+      { platforms: ["Xbox", "Nintendo Switch"], active: true },
+      { platforms: ["Nintendo Switch"], active: true },
+      { platforms: ["PlayStation"], active: false },
     ]),
   ).toEqual([
-    { name: "A", count: 2 },
-    { name: "B", count: 1 },
-    { name: "C", count: 2 },
+    { name: "Xbox", count: 2 },
+    { name: "PlayStation", count: 1 },
+    { name: "Nintendo Switch", count: 2 },
   ]);
 });

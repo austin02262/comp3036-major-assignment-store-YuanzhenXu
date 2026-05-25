@@ -1,16 +1,16 @@
 import { history } from "@/functions/history";
-import { type Post } from "@repo/db/data";
+import type { StoreProduct } from "@/lib/storeProducts";
 import { SummaryItem } from "./SummaryItem";
 
 export function HistoryList({
   selectedYear,
-  posts,
+  products,
 }: {
   selectedYear?: string;
-  posts: Post[];
+  products: StoreProduct[];
 }) {
   // Release year links group games by launch year.
-  const historyItems = history(posts);
+  const historyItems = history(products);
 
   if (historyItems.length === 0) return null;
 

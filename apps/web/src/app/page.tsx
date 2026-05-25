@@ -4,11 +4,11 @@ import { getPublicGames } from "../functions/games";
 import styles from "./page.module.css";
 
 export default async function Home() {
-  const posts = await getPublicGames();
+  const products = await getPublicGames();
 
   return (
     <AppLayout>
-      <Main posts={posts} className={styles.main} />
+      <Main products={products} className={styles.main} />
     </AppLayout>
   );
 }

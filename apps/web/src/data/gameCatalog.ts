@@ -1,7 +1,6 @@
-import type { Post } from "@repo/db/data";
 import type { StoreProduct } from "@/lib/storeProducts";
 
-// Frontend product catalogue used before the real product database is connected.
+// Fallback product catalogue used when the database is empty or unavailable.
 export const gameCatalog: StoreProduct[] = [
   {
     id: 101,
@@ -174,22 +173,6 @@ export const gameCatalog: StoreProduct[] = [
     releaseYear: 2020,
   },
 ];
-
-// Adapts game products to the shared Post-shaped data type used by this starter code.
-export const gamePosts: Post[] = gameCatalog.map((game) => ({
-  id: game.id,
-  urlId: game.urlId,
-  title: game.title,
-  content: game.content,
-  description: game.description,
-  imageUrl: game.imageUrl,
-  date: new Date(game.releaseDate),
-  category: game.category,
-  views: 0, // Compatibility field from the original Post type; not shown in UI.
-  likes: 0, // Compatibility field from the original Post type; like feature was removed.
-  tags: game.platforms.join(","),
-  active: true,
-}));
 
 // Finds the full game record for the detail page.
 export function findGameByUrlId(urlId: string) {

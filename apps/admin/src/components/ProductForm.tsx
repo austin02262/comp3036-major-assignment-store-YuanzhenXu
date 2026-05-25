@@ -36,7 +36,7 @@ function slugify(title: string) {
 }
 
 function readProducts() {
-  // Admin changes stay in localStorage until the backend product API is connected.
+  // LocalStorage keeps unsaved demo edits visible while the API stores persisted changes.
   if (typeof window === "undefined") {
     return adminProducts;
   }
@@ -215,8 +215,8 @@ export function ProductForm({
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    // Saves a new or edited game to localStorage and returns to the dashboard.
+  const handleSubmit = async (event: React.FormEvent) => {
+    // Saves a new or edited game locally and mirrors it to the product API.
     event.preventDefault();
 
     if (!validate()) {
@@ -247,6 +247,30 @@ export function ProductForm({
       : [product, ...currentProducts];
 
     window.localStorage.setItem(storageKey, JSON.stringify(nextProducts));
+
+    try {
+      await fetch(isEditing ? `/api/products/${product.id}` : "/api/products", {
+        method: isEditing ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: product.title,
+          description: product.description,
+          content: product.description,
+          imageUrl: product.imageUrl,
+          galleryImages: product.galleryImages || [],
+          category: product.category,
+          platform: product.platforms.join(", "),
+          platforms: product.platforms,
+          price: product.price,
+          stock: product.stock,
+          releaseDate: formData.releaseDate,
+          active: product.active,
+        }),
+      });
+    } catch {
+      // The local demo still works if the database API is unavailable.
+    }
+
     setSubmitSuccess(
       isEditing ? "Product updated successfully" : "Product created successfully",
     );

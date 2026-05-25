@@ -13,6 +13,11 @@ import path from "path";
 
 // Define the directory path
 const authDir = path.resolve(".auth");
+const databaseUrl =
+  process.env.DATABASE_URL ||
+  `file:${path.resolve("../../packages/db/prisma/dev.db").replace(/\\/g, "/")}`;
+
+process.env.DATABASE_URL = databaseUrl;
 
 // Create .auth directory if it doesn't exist
 if (!fs.existsSync(authDir)) {
@@ -64,7 +69,7 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         baseURL: "http://localhost:3002",
       },
-      dependencies: process.env.CI ? ["setup"] : [],
+      dependencies: ["setup"],
     },
     {
       name: "chromium",
@@ -73,7 +78,7 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         baseURL: "http://localhost:3001",
       },
-      dependencies: process.env.CI ? ["setup"] : [],
+      dependencies: ["setup"],
     },
 
     // {
@@ -113,16 +118,28 @@ export default defineConfig({
   webServer: process.env.CI
     ? [
         {
-          reuseExistingServer: true,
-          command: "pnpm start:admin",
+          reuseExistingServer: false,
+          command: "pnpm exec next start -p 3002",
+          cwd: path.resolve("../../apps/admin"),
+          env: {
+            ...process.env,
+            DATABASE_URL: databaseUrl,
+            PASSWORD: process.env.PASSWORD || "123",
+            JWT_SECRET: process.env.JWT_SECRET || "local-admin-secret",
+            E2E: "true",
+          },
           url: "http://localhost:3002",
-          // reuseExistingServer: !process.env.CI,
         },
         {
-          reuseExistingServer: true,
-          command: "pnpm start:web",
+          reuseExistingServer: false,
+          command: "pnpm exec next start -p 3001",
+          cwd: path.resolve("../../apps/web"),
+          env: {
+            ...process.env,
+            DATABASE_URL: databaseUrl,
+            E2E: "true",
+          },
           url: "http://localhost:3001",
-          // reuseExistingServer: !process.env.CI,
         },
       ]
     : undefined,

@@ -9,22 +9,21 @@ export default async function TagPage({
   params: Promise<{ tag: string }>;
 }) {
   const { tag } = await params;
-  const posts = await getPublicGames();
+  const products = await getPublicGames();
 
-  const filteredPosts = posts.filter((post) => {
+  const filteredProducts = products.filter((product) => {
     // Platform names are slugged so URLs stay readable.
-    const tags = post.tags
-      .split(",")
+    const tags = product.platforms
       .map((value) => value.trim().toLowerCase().replace(/\s+/g, "-"));
 
     return tags.includes(tag.toLowerCase());
   });
 
-  if (filteredPosts.length === 0) notFound();
+  if (filteredProducts.length === 0) notFound();
 
   return (
     <AppLayout>
-      <Main posts={filteredPosts} />
+      <Main products={filteredProducts} />
     </AppLayout>
   );
 }

@@ -9,16 +9,16 @@ export default async function CategoryPage({
 }) {
   const { name } = await params;
   const categoryName = decodeURIComponent(name);
-  const posts = await getPublicGames();
+  const products = await getPublicGames();
 
   // Filters games by genre from the sidebar links.
-  const filteredPosts = posts.filter(
-    post => post.category.toLowerCase() === categoryName.toLowerCase()
+  const filteredProducts = products.filter(
+    product => product.category.toLowerCase() === categoryName.toLowerCase()
   );
 
   return (
     <AppLayout>
-      <Main posts={filteredPosts} />
+      <Main products={filteredProducts} />
     </AppLayout>
   );
 }

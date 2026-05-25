@@ -1,16 +1,16 @@
-import { type Post } from "@repo/db/data";
+import type { StoreProduct } from "@/lib/storeProducts";
 import { tags } from "../../functions/tags";
 import { SummaryItem } from "./SummaryItem";
 
 export function TagList({
   selectedTag,
-  posts,
+  products,
 }: {
   selectedTag?: string;
-  posts: Post[];
+  products: StoreProduct[];
 }) {
-  // Platform links are stored in the legacy tag field.
-  const tagItems = tags(posts);
+  // Platform links filter games by supported console.
+  const tagItems = tags(products);
 
   if (tagItems.length === 0) return null;
 
@@ -27,7 +27,7 @@ export function TagList({
             <li key={item.name}>
               <SummaryItem
                 name={item.name}
-                title={`Tag / ${item.name}`}
+                title={`Platform / ${item.name}`}
                 count={item.count}
                 isSelected={selectedTag === item.name}
                 link={`/tags/${encodeURIComponent(tagSlug)}`}

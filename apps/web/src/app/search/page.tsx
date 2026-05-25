@@ -10,24 +10,24 @@ export default async function SearchPage({
 }) {
   
   const { q } = await searchParams;
-  const posts = await getPublicGames();
+  const products = await getPublicGames();
 
   const query = q?.trim().toLowerCase() || "";
 
-  const filteredPosts = posts.filter(post => {
+  const filteredProducts = products.filter((product) => {
     // Search matches exact title words, release year, genre, or platform.
     if (!query) return true;
 
-    const titleWords = post.title
+    const titleWords = product.title
       .toLowerCase()
       .split(/[^a-z0-9]+/)
       .filter(Boolean);
     const titleMatch = titleWords.includes(query);
-    const releaseYearMatch = post.date.getFullYear().toString() === query;
-    const categoryMatch = post.category.toLowerCase() === query;
-    const platformMatch = post.tags
-      .split(",")
-      .some((tag) => tag.trim().toLowerCase() === query);
+    const releaseYearMatch = product.releaseYear.toString() === query;
+    const categoryMatch = product.category.toLowerCase() === query;
+    const platformMatch = product.platforms.some(
+      (platform) => platform.trim().toLowerCase() === query,
+    );
 
     return titleMatch || releaseYearMatch || categoryMatch || platformMatch;
   });
@@ -44,7 +44,7 @@ export default async function SearchPage({
       </div>
 
     
-      <Main posts={filteredPosts} />
+      <Main products={filteredProducts} />
     </AppLayout>
   );
 }

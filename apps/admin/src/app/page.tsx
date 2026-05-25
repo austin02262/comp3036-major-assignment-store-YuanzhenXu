@@ -4,7 +4,56 @@ import { ProductList } from "../components/ProductList";
 import { LogoutButton } from "../components/LogoutButton";
 import styles from "./page.module.css";
 import { adminProducts } from "../data/adminProducts";
+import { productRecordToAdminProduct } from "../data/productRecordToAdminProduct";
+import { client } from "@repo/db/client";
 
+type AdminPurchase = {
+  id: string;
+  total: number;
+  createdAt: Date;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  items: {
+    id: number;
+    quantity: number;
+    productTitle: string;
+  }[];
+};
+
+async function getDashboardProducts() {
+  try {
+    const products = await client.db.product.findMany({
+      include: { category: true },
+      orderBy: { id: "asc" },
+    });
+
+    if (products.length > 0) {
+      return products.map(productRecordToAdminProduct);
+    }
+  } catch {
+    // Static seed data keeps the admin screen usable before the database is ready.
+  }
+
+  return adminProducts;
+}
+
+async function getRecentPurchases(): Promise<AdminPurchase[]> {
+  try {
+    return await client.db.purchase.findMany({
+      include: {
+        user: true,
+        items: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    });
+  } catch {
+    return [];
+  }
+}
 
 export default async function Home({
   searchParams,
@@ -35,8 +84,11 @@ export default async function Home({
     );
   }
 
-  // Dashboard summary uses the seeded frontend product catalogue.
-  const activeProducts = adminProducts.filter((product) => product.active).length;
+  // Dashboard summary and product list now read from the store database.
+  const products = await getDashboardProducts();
+  const purchases = await getRecentPurchases();
+  const activeProducts = products.filter((product) => product.active).length;
+  const purchaseRevenue = purchases.reduce((sum, purchase) => sum + purchase.total, 0);
 
   return (
     <main className={styles.main}>
@@ -60,11 +112,19 @@ export default async function Home({
       <section className={styles.stats} aria-label="Store overview">
         <article>
           <span>Total products</span>
-          <strong>{adminProducts.length}</strong>
+          <strong>{products.length}</strong>
         </article>
         <article>
           <span>Available products</span>
           <strong>{activeProducts}</strong>
+        </article>
+        <article>
+          <span>Recent orders</span>
+          <strong>{purchases.length}</strong>
+        </article>
+        <article>
+          <span>Recent revenue</span>
+          <strong>${purchaseRevenue.toFixed(2)}</strong>
         </article>
       </section>
 
@@ -83,7 +143,49 @@ export default async function Home({
       )}
       
      
-      <ProductList initialProducts={adminProducts} />
+      <section className={styles.orders} aria-label="Recent purchases">
+        <div className={styles.ordersHeader}>
+          <div>
+            <p className={styles.eyebrow}>Purchase Records</p>
+            <h2>Recent Orders</h2>
+          </div>
+          <span>{purchases.length} shown</span>
+        </div>
+        {purchases.length === 0 ? (
+          <p className={styles.emptyOrders}>No purchases have been recorded yet.</p>
+        ) : (
+          <div className={styles.orderList}>
+            {purchases.map((purchase) => (
+              <article key={purchase.id} className={styles.orderCard}>
+                <div>
+                  <strong>{purchase.id}</strong>
+                  <p>
+                    {purchase.user.firstName} {purchase.user.lastName} /{" "}
+                    {purchase.user.email}
+                  </p>
+                  <p>
+                    {purchase.items
+                      .map((item) => `${item.productTitle} x ${item.quantity}`)
+                      .join(", ")}
+                  </p>
+                </div>
+                <div>
+                  <strong>${purchase.total.toFixed(2)}</strong>
+                  <span>
+                    {new Intl.DateTimeFormat("en-AU", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    }).format(purchase.createdAt)}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <ProductList initialProducts={products} />
     </main>
   );
 }

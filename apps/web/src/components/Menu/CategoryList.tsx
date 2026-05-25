@@ -1,10 +1,10 @@
 import { categories } from "@/functions/categories";
-import type { Post } from "@repo/db/data";
+import type { StoreProduct } from "@/lib/storeProducts";
 import { SummaryItem } from "./SummaryItem";
 
-export function CategoryList({ posts }: { posts: Post[] }) {
+export function CategoryList({ products }: { products: StoreProduct[] }) {
   // Genre links filter the storefront by game category.
-  const items = categories(posts);
+  const items = categories(products);
   if (items.length === 0) return null;
 
   return (

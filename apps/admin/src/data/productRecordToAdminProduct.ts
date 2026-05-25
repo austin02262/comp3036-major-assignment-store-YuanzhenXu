@@ -1,30 +1,12 @@
-export type StoreProduct = {
-  id: number;
-  urlId: string;
-  title: string;
-  description: string;
-  content: string;
-  imageUrl: string;
-  screenshots: string[];
-  category: string;
-  platform: string;
-  platforms: string[];
-  price: number;
-  stock: number;
-  releaseDate: string;
-  releaseYear: number;
-  active?: boolean;
-};
+import type { AdminProduct } from "./adminProducts";
 
-export type ProductRecord = {
+type ProductRecord = {
   id: number;
   urlId: string;
   title: string;
   description: string;
-  content: string;
   imageUrl: string;
   galleryImages: string;
-  platform: string;
   platforms: string;
   price: number;
   stock: number;
@@ -35,15 +17,9 @@ export type ProductRecord = {
   };
 };
 
-// Central price formatter for all storefront UI.
-export function formatPrice(price: number): string {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: "AUD",
-  }).format(price);
-}
-
-export function productRecordToStoreProduct(product: ProductRecord): StoreProduct {
+export function productRecordToAdminProduct(
+  product: ProductRecord,
+): AdminProduct {
   const releaseDate = new Date(product.releaseDate);
 
   return {
@@ -51,14 +27,12 @@ export function productRecordToStoreProduct(product: ProductRecord): StoreProduc
     urlId: product.urlId,
     title: product.title,
     description: product.description,
-    content: product.content,
     imageUrl: product.imageUrl,
-    screenshots: product.galleryImages
+    galleryImages: product.galleryImages
       .split(",")
       .map((image) => image.trim())
       .filter(Boolean),
     category: product.category.name,
-    platform: product.platform,
     platforms: product.platforms
       .split(",")
       .map((platform) => platform.trim())

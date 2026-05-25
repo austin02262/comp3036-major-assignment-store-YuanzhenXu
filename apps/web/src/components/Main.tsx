@@ -1,19 +1,19 @@
-import type { Post } from "@repo/db/data";
+import type { StoreProduct } from "@/lib/storeProducts";
 import { GameStorefront } from "./Store/GameStorefront";
 
 export function Main({
-  posts,
+  products,
   className,
 }: {
-  posts: Post[];
+  products: StoreProduct[];
   className?: string;
 }) {
   // Only active games appear on the customer storefront.
-  const activePosts = posts.filter((post) => post.active);
+  const activeProducts = products.filter((product) => product.active !== false);
 
   return (
     <main className={className}>
-      <GameStorefront posts={activePosts} />
+      <GameStorefront products={activeProducts} />
     </main>
   );
 }
