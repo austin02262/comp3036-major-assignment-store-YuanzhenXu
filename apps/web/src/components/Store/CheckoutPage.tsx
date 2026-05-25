@@ -78,7 +78,10 @@ export function CheckoutPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [city, setCity] = useState("");
+  const [stateRegion, setStateRegion] = useState("");
   const [postcode, setPostcode] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [error, setError] = useState("");
@@ -121,7 +124,9 @@ export function CheckoutPage() {
       !lastName.trim() ||
       !email.trim() ||
       !phone.trim() ||
-      !address.trim() ||
+      !addressLine1.trim() ||
+      !city.trim() ||
+      !stateRegion.trim() ||
       !postcode.trim() ||
       !cardNumber.trim()
     ) {
@@ -129,8 +134,22 @@ export function CheckoutPage() {
       return;
     }
 
+    if (cardNumber.length !== 16) {
+      setError("Please enter a valid 16-digit card number.");
+      return;
+    }
+
     const customerName = `${firstName} ${lastName}`;
-    const deliveryAddress = `${address}, ${postcode}`;
+    const deliveryAddress = [
+      addressLine1,
+      addressLine2,
+      city,
+      stateRegion,
+      postcode,
+    ]
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .join(", ");
     let purchase: Purchase | undefined;
 
     try {
@@ -142,7 +161,7 @@ export function CheckoutPage() {
           lastName,
           email,
           phone,
-          address,
+          address: deliveryAddress,
           postcode,
           items: items.map((item) => ({
             productId: item.id,
@@ -288,22 +307,26 @@ export function CheckoutPage() {
                 <Field label="Phone number" value={phone} onChange={setPhone} />
                 <Field
                   label="Mock card number"
-                  placeholder="4242 4242 4242 4242"
+                  placeholder="4242424242424242"
                   value={cardNumber}
-                  onChange={setCardNumber}
+                  onChange={(value) =>
+                    setCardNumber(value.replace(/\D/g, "").slice(0, 16))
+                  }
+                  inputMode="numeric"
+                  maxLength={16}
                 />
-                <div className="md:col-span-2">
-                  <label htmlFor="address" className="font-semibold text-gray-900 dark:text-white">
-                    Delivery address
-                  </label>
-                  <textarea
-                    id="address"
-                    rows={3}
-                    value={address}
-                    onChange={(event) => setAddress(event.target.value)}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 dark:border-white/10 dark:bg-gray-900 dark:text-white"
-                  />
-                </div>
+                <Field
+                  label="Address line 1"
+                  value={addressLine1}
+                  onChange={setAddressLine1}
+                />
+                <Field
+                  label="Address line 2"
+                  value={addressLine2}
+                  onChange={setAddressLine2}
+                />
+                <Field label="City" value={city} onChange={setCity} />
+                <Field label="State" value={stateRegion} onChange={setStateRegion} />
                 <Field label="Postcode" value={postcode} onChange={setPostcode} />
               </div>
             </section>
@@ -355,12 +378,16 @@ function Field({
   onChange,
   type = "text",
   placeholder,
+  inputMode,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type?: string;
   placeholder?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  maxLength?: number;
 }) {
   // Small shared field component keeps checkout form markup consistent.
   const id = label.toLowerCase().replace(/\s+/g, "-");
@@ -374,6 +401,8 @@ function Field({
         id={id}
         type={type}
         placeholder={placeholder}
+        inputMode={inputMode}
+        maxLength={maxLength}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 dark:border-white/10 dark:bg-gray-900 dark:text-white"

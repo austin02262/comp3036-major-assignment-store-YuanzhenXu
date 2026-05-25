@@ -12,6 +12,8 @@ test.describe("CUSTOMER PURCHASE HISTORY", () => {
             id: "GH-E2E",
             customerName: "Yuanzhen Xu",
             email: "yuanzhen@example.com",
+            phone: "0400000000",
+            address: "1 GameHub Street, Apartment 2, Sydney, NSW, 2000",
             total: 59.95,
             createdAt: new Date().toISOString(),
             items: [
@@ -40,11 +42,19 @@ test.describe("CUSTOMER PURCHASE HISTORY", () => {
     await page.goto("/purchases");
     await expect(page.getByRole("heading", { name: "Purchase History" })).toBeVisible();
     await expect(page.getByText("GH-E2E")).toBeVisible();
+    await expect(page.getByText("Phone: 0400000000")).toBeVisible();
+    await expect(
+      page.getByText("Address: 1 GameHub Street, Apartment 2, Sydney, NSW, 2000"),
+    ).toBeVisible();
     await expect(page.getByText("Halo Infinite x 1")).toBeVisible();
 
     await page.getByRole("button", { name: "Buy Again" }).click();
     await expect(page.getByText("Previous purchase added to cart.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Cart (1)" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(page.getByText("Purchase record deleted.")).toBeVisible();
+    await expect(page.getByText("GH-E2E")).toBeHidden();
   });
 
   test("rejects incomplete checkout requests", { tag: "@a3" }, async ({ request }) => {

@@ -23,8 +23,11 @@ test.describe("CUSTOMER CHECKOUT", () => {
     await page.getByLabel("Last name").fill("Xu");
     await page.getByLabel("Email").fill("yuanzhen@example.com");
     await page.getByLabel("Phone number").fill("0400000000");
-    await page.getByLabel("Mock card number").fill("4242 4242 4242 4242");
-    await page.getByLabel("Delivery address").fill("1 GameHub Street");
+    await page.getByLabel("Mock card number").fill("4242424242424242");
+    await page.getByLabel("Address line 1").fill("1 GameHub Street");
+    await page.getByLabel("Address line 2").fill("Apartment 2");
+    await page.getByLabel("City").fill("Sydney");
+    await page.getByLabel("State").fill("NSW");
     await page.getByLabel("Postcode").fill("2000");
     await page.getByRole("button", { name: /Pay/ }).click();
 

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { adminProducts, type AdminProduct } from "../data/adminProducts";
+import type { AdminProduct } from "../data/adminProducts";
 import styles from "./ProductForm.module.css";
 
 type ProductFormData = {
@@ -22,34 +22,8 @@ interface ProductFormProps {
   lookupUrlId?: string;
 }
 
-const storageKey = "gamehub-admin-products";
 const platformOptions = ["Xbox", "PlayStation", "Nintendo Switch"];
 const genreOptions = ["Action", "Adventure", "FPS", "Racing", "RPG"];
-
-function slugify(title: string) {
-  // Creates a URL-safe id for newly added games.
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-function readProducts() {
-  // LocalStorage keeps unsaved demo edits visible while the API stores persisted changes.
-  if (typeof window === "undefined") {
-    return adminProducts;
-  }
-
-  try {
-    const savedProducts = window.localStorage.getItem(storageKey);
-    return savedProducts
-      ? (JSON.parse(savedProducts) as AdminProduct[])
-      : adminProducts;
-  } catch {
-    return adminProducts;
-  }
-}
 
 function toDateInputValue(dateValue?: string) {
   // Converts display dates into the yyyy-mm-dd format required by date inputs.
@@ -63,22 +37,6 @@ function toDateInputValue(dateValue?: string) {
   }
 
   return date.toISOString().slice(0, 10);
-}
-
-function formatReleaseDate(dateValue: string) {
-  // Stores release dates in the same readable format as the storefront.
-  const date = new Date(`${dateValue}T00:00:00`);
-
-  return new Intl.DateTimeFormat("en-AU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
-}
-
-function getReleaseYear(dateValue: string) {
-  // Release year is derived from the full date, so admins enter it only once.
-  return new Date(`${dateValue}T00:00:00`).getFullYear();
 }
 
 export function ProductForm({
@@ -102,30 +60,22 @@ export function ProductForm({
   const [submitSuccess, setSubmitSuccess] = useState("");
 
   useEffect(() => {
-    if (!isEditing || !lookupUrlId) {
+    if (!isEditing || !lookupUrlId || !initialData) {
       return;
     }
 
-    const savedProduct = readProducts().find(
-      (product) => product.urlId === lookupUrlId,
-    );
-
-    if (!savedProduct) {
-      return;
-    }
-
-    setEditingProduct(savedProduct);
+    setEditingProduct(initialData);
     setFormData({
-      title: savedProduct.title,
-      description: savedProduct.description,
-      imageUrl: savedProduct.imageUrl,
-      galleryImages: savedProduct.galleryImages || [],
-      category: savedProduct.category,
-      platforms: savedProduct.platforms,
-      price: String(savedProduct.price),
-      releaseDate: toDateInputValue(savedProduct.releaseDate),
+      title: initialData.title,
+      description: initialData.description,
+      imageUrl: initialData.imageUrl,
+      galleryImages: initialData.galleryImages || [],
+      category: initialData.category,
+      platforms: initialData.platforms,
+      price: String(initialData.price),
+      releaseDate: toDateInputValue(initialData.releaseDate),
     });
-  }, [isEditing, lookupUrlId]);
+  }, [initialData, isEditing, lookupUrlId]);
 
   const updateFormData = (nextData: Partial<ProductFormData>) => {
     // Central state update helper for all product form fields.
@@ -216,59 +166,55 @@ export function ProductForm({
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
-    // Saves a new or edited game locally and mirrors it to the product API.
+    // Saves a new or edited game through the API, then updates the admin preview.
     event.preventDefault();
 
     if (!validate()) {
       return;
     }
 
-    const currentProducts = readProducts();
-    const product: AdminProduct = {
-      id: editingProduct?.id || Date.now(),
-      urlId: editingProduct?.urlId || slugify(formData.title),
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      imageUrl: formData.imageUrl.trim(),
-      galleryImages: formData.galleryImages,
-      category: formData.category.trim(),
-      platforms: formData.platforms,
-      price: Number(formData.price),
-      stock: editingProduct?.stock || 0,
-      releaseDate: formatReleaseDate(formData.releaseDate),
-      releaseYear: getReleaseYear(formData.releaseDate),
-      active: editingProduct?.active ?? true,
-    };
-
-    const nextProducts = isEditing
-      ? currentProducts.some((item) => item.id === product.id)
-        ? currentProducts.map((item) => (item.id === product.id ? product : item))
-        : [product, ...currentProducts]
-      : [product, ...currentProducts];
-
-    window.localStorage.setItem(storageKey, JSON.stringify(nextProducts));
-
     try {
-      await fetch(isEditing ? `/api/products/${product.id}` : "/api/products", {
-        method: isEditing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: product.title,
-          description: product.description,
-          content: product.description,
-          imageUrl: product.imageUrl,
-          galleryImages: product.galleryImages || [],
-          category: product.category,
-          platform: product.platforms.join(", "),
-          platforms: product.platforms,
-          price: product.price,
-          stock: product.stock,
-          releaseDate: formData.releaseDate,
-          active: product.active,
-        }),
-      });
+      const response = await fetch(
+        isEditing && editingProduct
+          ? `/api/products/${editingProduct.id}`
+          : "/api/products",
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: formData.title.trim(),
+            description: formData.description.trim(),
+            content: formData.description.trim(),
+            imageUrl: formData.imageUrl.trim(),
+            galleryImages: formData.galleryImages || [],
+            category: formData.category.trim(),
+            platform: formData.platforms.join(", "),
+            platforms: formData.platforms,
+            price: Number(formData.price),
+            stock: editingProduct?.stock || 0,
+            releaseDate: formData.releaseDate,
+            active: editingProduct?.active ?? true,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const message = await response.text();
+
+        setErrors({
+          form:
+            message ||
+            "Game could not be saved to the database. Please try again.",
+        });
+        return;
+      }
+
+      await response.json();
     } catch {
-      // The local demo still works if the database API is unavailable.
+      setErrors({
+        form: "Game could not be saved to the database. Please try again.",
+      });
+      return;
     }
 
     setSubmitSuccess(
@@ -427,6 +373,7 @@ export function ProductForm({
       </div>
 
       {submitSuccess && <div className={styles.success}>{submitSuccess}</div>}
+      {errors.form && <div className={styles.errorBanner}>{errors.form}</div>}
 
       <div className={styles.actions}>
         <a href="/">Back to dashboard</a>
