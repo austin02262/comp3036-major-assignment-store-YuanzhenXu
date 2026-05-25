@@ -17,8 +17,6 @@ const formatPrice = (price: number) =>
     currency: "AUD",
   }).format(price);
 
-const storageKey = "gamehub-admin-products";
-
 export function ProductList({
   initialProducts,
 }: {
@@ -33,15 +31,8 @@ export function ProductList({
   const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
-    // Loads any products created or edited during the admin demo.
-    try {
-      const savedProducts = window.localStorage.getItem(storageKey);
-      if (savedProducts) {
-        setProducts(JSON.parse(savedProducts) as AdminProduct[]);
-      }
-    } catch {
-      setProducts(initialProducts);
-    }
+    // Keeps the client-side filters aligned with the database-loaded products.
+    setProducts(initialProducts);
   }, [initialProducts]);
 
   const platforms = useMemo(
@@ -88,24 +79,32 @@ export function ProductList({
     });
 
   const toggleProductState = async (productId: number) => {
-    // Toggles local UI first, then mirrors the status change to the product API.
+    // Toggles product availability through the API, then updates the visible list.
+    const product = products.find((item) => item.id === productId);
+    if (!product) {
+      return;
+    }
+
     const nextProducts = products.map((product) =>
       product.id === productId ? { ...product, active: !product.active } : product,
     );
-    setProducts(nextProducts);
-    window.localStorage.setItem(storageKey, JSON.stringify(nextProducts));
 
     try {
-      await fetch(`/api/products/${productId}`, { method: "PATCH" });
-    } catch {
-      // LocalStorage keeps the admin demo usable if the API is unavailable.
-    }
+      const response = await fetch(`/api/products/${productId}`, {
+        method: "PATCH",
+      });
 
-    const product = products.find((item) => item.id === productId);
-    if (product) {
+      if (!response.ok) {
+        setStatusMessage("Product status could not be updated.");
+        return;
+      }
+
+      setProducts(nextProducts);
       setStatusMessage(
         `${product.title} is now ${product.active ? "out of stock" : "available"}.`,
       );
+    } catch {
+      setStatusMessage("Product status could not be updated.");
     }
   };
 

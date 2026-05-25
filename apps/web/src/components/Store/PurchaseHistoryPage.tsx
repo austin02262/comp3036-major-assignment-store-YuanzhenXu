@@ -14,6 +14,8 @@ type Purchase = {
   id: string;
   customerName: string;
   email: string;
+  phone?: string;
+  address?: string;
   total: number;
   createdAt: string;
   items: PurchaseItem[];
@@ -62,6 +64,13 @@ export function PurchaseHistoryPage() {
     setPurchases(readPurchases());
   }, []);
 
+  const deletePurchase = (purchaseId: string) => {
+    const nextPurchases = purchases.filter((purchase) => purchase.id !== purchaseId);
+    setPurchases(nextPurchases);
+    window.localStorage.setItem(purchasesKey, JSON.stringify(nextPurchases));
+    setMessage("Purchase record deleted.");
+  };
+
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-950">Purchase History</h1>
@@ -94,6 +103,12 @@ export function PurchaseHistoryPage() {
                   <p className="text-sm text-gray-600">
                     {purchase.customerName} / {purchase.email}
                   </p>
+                  {purchase.phone && (
+                    <p className="text-sm text-gray-600">Phone: {purchase.phone}</p>
+                  )}
+                  {purchase.address && (
+                    <p className="text-sm text-gray-600">Address: {purchase.address}</p>
+                  )}
                   <p className="text-sm text-gray-500">
                     {new Date(purchase.createdAt).toLocaleString("en-AU")}
                   </p>
@@ -111,6 +126,13 @@ export function PurchaseHistoryPage() {
                     className="mt-3 rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800"
                   >
                     Buy Again
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deletePurchase(purchase.id)}
+                    className="ml-2 mt-3 rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50"
+                  >
+                    Delete
                   </button>
                 </div>
               </div>

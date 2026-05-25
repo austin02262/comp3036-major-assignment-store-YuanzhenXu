@@ -166,6 +166,16 @@
   font-weight: 700;
 }
 
+.errorBanner {
+  margin-top: 18px;
+  padding: 12px 14px;
+  color: #991b1b;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
 .actions {
   display: flex;
   gap: 14px;
