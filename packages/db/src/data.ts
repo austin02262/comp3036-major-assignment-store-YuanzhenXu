@@ -1,4 +1,5 @@
 export type ProductSeed = {
+  // Seed shape mirrors the Prisma Product fields plus category name.
   id: number;
   urlId: string;
   title: string;
@@ -16,6 +17,7 @@ export type ProductSeed = {
 };
 
 export const products: ProductSeed[] = [
+  // Initial catalogue used by local development, tests, and database seeding.
   {
     id: 101,
     urlId: "god-of-war-ragnarok",

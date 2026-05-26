@@ -3,6 +3,7 @@ import { products } from "./data.js";
 import { fileURLToPath } from "node:url";
 
 export async function seed() {
+  // Reset dependent tables first so repeated seeds start from a clean database.
   await client.db.purchaseItem.deleteMany();
   await client.db.purchase.deleteMany();
   await client.db.user.deleteMany();
@@ -10,6 +11,7 @@ export async function seed() {
   await client.db.category.deleteMany();
 
   for (const product of products) {
+    // Each product is linked to a reusable category row.
     const category = await client.db.category.upsert({
       where: { name: product.category },
       update: {},
@@ -38,6 +40,7 @@ export async function seed() {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  // Allows `pnpm db:seed` to run this file directly after TypeScript build.
   seed()
     .then(() => {
       console.log("Seeded GameHub products");

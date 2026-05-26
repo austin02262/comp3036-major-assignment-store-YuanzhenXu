@@ -63,6 +63,7 @@ function normalizePayload(payload: ProductPayload) {
 }
 
 export async function GET() {
+  // Admin dashboard reads the full product catalogue, including hidden products.
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
 
@@ -75,6 +76,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Creates a new product record from the admin "Add Game" form.
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
 
@@ -110,6 +112,7 @@ export async function POST(request: Request) {
       releaseDate: data.releaseDate,
       active: data.active,
       category: {
+        // Reuses an existing genre row or creates it for new product categories.
         connectOrCreate: {
           where: { name: data.category },
           create: { name: data.category },

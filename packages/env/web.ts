@@ -25,6 +25,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     // E2E: process.env.E2E,
+    // SQLite defaults to the Prisma folder database used by local dev and tests.
     DATABASE_URL: process.env.DATABASE_URL || "file:./dev.db",
   },
   /**

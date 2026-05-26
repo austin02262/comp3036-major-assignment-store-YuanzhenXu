@@ -63,6 +63,7 @@ function normalizePayload(payload: ProductPayload) {
 }
 
 function parseProductId(id: string) {
+  // Route params arrive as strings, so the API validates them before database use.
   const productId = Number(id);
   return Number.isNaN(productId) ? undefined : productId;
 }
@@ -71,6 +72,7 @@ export async function PATCH(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // PATCH is used by the admin dashboard to toggle storefront availability.
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
 
@@ -102,6 +104,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // PUT updates editable product fields from the admin edit form.
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
 
@@ -151,6 +154,7 @@ export async function PUT(
       ...(data.releaseDate ? { releaseDate: data.releaseDate } : {}),
       ...(data.active !== undefined ? { active: data.active } : {}),
       category: {
+        // Genre changes are linked through the Category relation.
         connectOrCreate: {
           where: { name: category },
           create: { name: category },
@@ -167,6 +171,7 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // DELETE soft-hides a product so purchase records can still reference it.
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
 
