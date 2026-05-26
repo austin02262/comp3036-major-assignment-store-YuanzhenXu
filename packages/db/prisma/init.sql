@@ -1,9 +1,11 @@
+-- Creates the local SQLite schema used by Playwright and CI before seeding.
 CREATE TABLE IF NOT EXISTS "Category" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   "name" TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "Product" (
+  -- Products are the games shown in the customer storefront.
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   "urlId" TEXT NOT NULL,
   "title" TEXT NOT NULL,
@@ -24,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "Product" (
 );
 
 CREATE TABLE IF NOT EXISTS "User" (
+  -- Customer contact and delivery details for purchase records.
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   "email" TEXT NOT NULL,
   "firstName" TEXT NOT NULL,
@@ -35,6 +38,7 @@ CREATE TABLE IF NOT EXISTS "User" (
 );
 
 CREATE TABLE IF NOT EXISTS "Purchase" (
+  -- A completed checkout order.
   "id" TEXT NOT NULL PRIMARY KEY,
   "userId" INTEGER NOT NULL,
   "total" REAL NOT NULL,
@@ -43,6 +47,7 @@ CREATE TABLE IF NOT EXISTS "Purchase" (
 );
 
 CREATE TABLE IF NOT EXISTS "PurchaseItem" (
+  -- Line items preserve product title and price at purchase time.
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   "purchaseId" TEXT NOT NULL,
   "productId" INTEGER NOT NULL,
@@ -54,6 +59,7 @@ CREATE TABLE IF NOT EXISTS "PurchaseItem" (
   CONSTRAINT "PurchaseItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- Unique indexes support category reuse, product URLs, and user lookup.
 CREATE UNIQUE INDEX IF NOT EXISTS "Category_name_key" ON "Category"("name");
 CREATE UNIQUE INDEX IF NOT EXISTS "Product_urlId_key" ON "Product"("urlId");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");

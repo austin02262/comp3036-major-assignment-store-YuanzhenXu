@@ -4,6 +4,7 @@ import { client } from "@repo/db/client";
 import { requireAdmin } from "../../../utils/apiAuth";
 
 export async function GET() {
+  // Admin-only endpoint for reviewing all customer purchase records.
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
 

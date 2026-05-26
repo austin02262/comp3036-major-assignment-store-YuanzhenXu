@@ -8,12 +8,14 @@ datasource db {
 }
 
 model Category {
+  // Product genre such as Action, RPG, Racing, or FPS.
   id       Int       @id @default(autoincrement())
   name     String    @unique
   products Product[]
 }
 
 model Product {
+  // Storefront product managed by admin and displayed to customers.
   id            Int            @id @default(autoincrement())
   urlId         String         @unique
   title         String
@@ -35,6 +37,7 @@ model Product {
 }
 
 model User {
+  // Customer details are stored with purchases for order history.
   id        Int        @id @default(autoincrement())
   email     String     @unique
   firstName String
@@ -47,6 +50,7 @@ model User {
 }
 
 model Purchase {
+  // One checkout order owned by a customer.
   id        String         @id
   userId    Int
   total     Float
@@ -56,6 +60,7 @@ model Purchase {
 }
 
 model PurchaseItem {
+  // Snapshot of each purchased product at checkout time.
   id              Int      @id @default(autoincrement())
   purchaseId      String
   productId       Int

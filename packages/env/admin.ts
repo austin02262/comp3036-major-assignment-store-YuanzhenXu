@@ -26,6 +26,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     // E2E: process.env.E2E,
+    // Local defaults keep the classroom demo easy to run without private env files.
     PASSWORD: process.env.PASSWORD || "123",
     JWT_SECRET: process.env.JWT_SECRET || "local-admin-secret",
   },

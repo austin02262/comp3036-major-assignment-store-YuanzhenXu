@@ -13,10 +13,12 @@ type PurchasePayload = {
 };
 
 function clean(value?: string) {
+  // Trims optional form values before server-side validation.
   return value?.trim() || "";
 }
 
 export async function GET() {
+  // Public purchase history endpoint used by the customer prototype.
   const purchases = await client.db.purchase.findMany({
     include: {
       user: true,
@@ -29,6 +31,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Checkout receives cart items and turns them into persisted purchase records.
   const payload = (await request.json()) as PurchasePayload;
   const items = (payload.items || [])
     .map((item) => ({
@@ -56,6 +59,7 @@ export async function POST(request: Request) {
   }
 
   const productIds = items.map((item) => item.productId);
+  // Only active products can be purchased from the storefront.
   const products = await client.db.product.findMany({
     where: { id: { in: productIds }, active: true },
   });
@@ -68,6 +72,7 @@ export async function POST(request: Request) {
   }
 
   const total = items.reduce((sum, item) => {
+    // The server recalculates totals instead of trusting the browser.
     const product = products.find((entry) => entry.id === item.productId);
     return sum + (product?.price || 0) * item.quantity;
   }, 0);
