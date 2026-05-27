@@ -4,9 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GameImage } from "@/components/Store/GameImage";
 import { formatPrice, type StoreProduct } from "@/lib/storeProducts";
-
-const cartKey = "gamehub-cart";
-const purchasesKey = "gamehub-purchases";
+import { clearCart, readCart, saveCart } from "@/utils/cartStorage";
 
 type CartItem = StoreProduct & {
   quantity: number;
@@ -22,30 +20,6 @@ type Purchase = {
   createdAt: string;
   items: CartItem[];
 };
-
-function readCart(): CartItem[] {
-  // Loads selected products for the combined cart and checkout page.
-  try {
-    return JSON.parse(window.localStorage.getItem(cartKey) || "[]") as CartItem[];
-  } catch {
-    return [];
-  }
-}
-
-function saveCart(items: CartItem[]) {
-  // Saves cart edits made directly on the checkout page.
-  window.localStorage.setItem(cartKey, JSON.stringify(items));
-  window.dispatchEvent(new Event("gamehub-cart-updated"));
-}
-
-function readPurchases(): Purchase[] {
-  // Browser purchase history remains as a fallback for the frontend demo.
-  try {
-    return JSON.parse(window.localStorage.getItem(purchasesKey) || "[]") as Purchase[];
-  } catch {
-    return [];
-  }
-}
 
 function apiPurchaseToLocalPurchase(
   apiPurchase: {
@@ -188,24 +162,11 @@ export function CheckoutPage() {
         items,
       );
     } catch {
-      purchase = {
-        id: `GH-${Date.now()}`,
-        customerName,
-        email,
-        phone,
-        address: deliveryAddress,
-        total,
-        createdAt: new Date().toISOString(),
-        items,
-      };
+      setError("Purchase could not be saved. Please try again.");
+      return;
     }
 
-    window.localStorage.setItem(
-      purchasesKey,
-      JSON.stringify([purchase, ...readPurchases()]),
-    );
-    window.localStorage.removeItem(cartKey);
-    window.dispatchEvent(new Event("gamehub-cart-updated"));
+    clearCart();
     router.push(`/checkout/success?order=${purchase.id}`);
   };
 

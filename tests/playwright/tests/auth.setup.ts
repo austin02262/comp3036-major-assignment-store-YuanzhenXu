@@ -1,10 +1,9 @@
 import { test as setup } from "@playwright/test";
 import fs from "fs";
-import path from "path";
 import { PrismaClient } from "@prisma/client";
 import { products } from "../../../packages/db/src/data";
 
-setup("prepare auth directory", async () => {
+setup("reset database and seed products", async () => {
   if (!fs.existsSync(".auth")) {
     fs.mkdirSync(".auth");
   }
@@ -12,19 +11,6 @@ setup("prepare auth directory", async () => {
   const db = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
 
   try {
-    const initSql = fs.readFileSync(
-      path.resolve("../../packages/db/prisma/init.sql"),
-      "utf8",
-    );
-    const statements = initSql
-      .split(";")
-      .map((statement) => statement.trim())
-      .filter(Boolean);
-
-    for (const statement of statements) {
-      await db.$executeRawUnsafe(statement);
-    }
-
     await db.purchaseItem.deleteMany();
     await db.purchase.deleteMany();
     await db.user.deleteMany();

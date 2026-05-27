@@ -17,11 +17,17 @@ export const createClient = () => {
   });
 
   console.log("Connected to database");
-  console.log(URL);
 
   global.prisma = prisma;
   return prisma;
 };
+
+export async function resetClient() {
+  if (!global.prisma) return;
+
+  await global.prisma.$disconnect();
+  global.prisma = undefined;
+}
 
 export const client = {
   get db() {

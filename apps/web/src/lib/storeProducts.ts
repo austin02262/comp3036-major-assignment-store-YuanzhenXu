@@ -43,6 +43,28 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
+function parseGalleryImages(value: string) {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) return [];
+
+  if (trimmedValue.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmedValue);
+      return Array.isArray(parsed)
+        ? parsed.filter((image): image is string => typeof image === "string")
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return trimmedValue
+    .match(/data:image\/[^;]+;base64,[^,]+(?=,data:image\/|$)|[^,]+/g)
+    ?.map((image) => image.trim())
+    .filter(Boolean) || [];
+}
+
 export function productRecordToStoreProduct(product: ProductRecord): StoreProduct {
   const releaseDate = new Date(product.releaseDate);
 
@@ -53,10 +75,7 @@ export function productRecordToStoreProduct(product: ProductRecord): StoreProduc
     description: product.description,
     content: product.content,
     imageUrl: product.imageUrl,
-    screenshots: product.galleryImages
-      .split(",")
-      .map((image) => image.trim())
-      .filter(Boolean),
+    screenshots: parseGalleryImages(product.galleryImages),
     category: product.category.name,
     platform: product.platform,
     platforms: product.platforms

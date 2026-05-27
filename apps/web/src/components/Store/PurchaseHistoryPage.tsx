@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatPrice, type StoreProduct } from "@/lib/storeProducts";
-
-const purchasesKey = "gamehub-purchases";
-const cartKey = "gamehub-cart";
+import { readCart, saveCart } from "@/utils/cartStorage";
 
 type PurchaseItem = StoreProduct & {
   quantity: number;
@@ -21,21 +19,81 @@ type Purchase = {
   items: PurchaseItem[];
 };
 
-function readPurchases(): Purchase[] {
-  // Loads completed mock orders from the browser.
-  try {
-    return JSON.parse(window.localStorage.getItem(purchasesKey) || "[]") as Purchase[];
-  } catch {
-    return [];
-  }
-}
+type ApiPurchase = {
+  id: string;
+  total: number;
+  createdAt: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+    address?: string;
+  };
+  items: {
+    quantity: number;
+    unitPrice: number;
+    product: {
+      id: number;
+      urlId: string;
+      title: string;
+      description: string;
+      content: string;
+      imageUrl: string;
+      galleryImages: string;
+      platform: string;
+      platforms: string;
+      price: number;
+      stock: number;
+      releaseDate: string;
+      active: boolean;
+      category: { name: string };
+    };
+  }[];
+};
 
-function readCart(): PurchaseItem[] {
-  try {
-    return JSON.parse(window.localStorage.getItem(cartKey) || "[]") as PurchaseItem[];
-  } catch {
-    return [];
-  }
+function apiPurchaseToPurchase(purchase: ApiPurchase): Purchase {
+  return {
+    id: purchase.id,
+    customerName: `${purchase.user.firstName} ${purchase.user.lastName}`.trim(),
+    email: purchase.user.email,
+    phone: purchase.user.phone,
+    address: purchase.user.address,
+    total: purchase.total,
+    createdAt: purchase.createdAt,
+    items: purchase.items.map(({ quantity, unitPrice, product }) => {
+      const releaseDate = new Date(product.releaseDate);
+
+      return {
+        id: product.id,
+        urlId: product.urlId,
+        title: product.title,
+        description: product.description,
+        content: product.content,
+        imageUrl: product.imageUrl,
+        screenshots: product.galleryImages
+          .split(",")
+          .map((image) => image.trim())
+          .filter(Boolean),
+        category: product.category.name,
+        platform: product.platform,
+        platforms: product.platforms
+          .split(",")
+          .map((platform) => platform.trim())
+          .filter(Boolean),
+        price: unitPrice,
+        stock: product.stock,
+        releaseDate: releaseDate.toLocaleDateString("en-AU", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
+        releaseYear: releaseDate.getFullYear(),
+        active: product.active,
+        quantity,
+      };
+    }),
+  };
 }
 
 function addPurchaseToCart(items: PurchaseItem[]) {
@@ -52,8 +110,7 @@ function addPurchaseToCart(items: PurchaseItem[]) {
     }
   }
 
-  window.localStorage.setItem(cartKey, JSON.stringify(cart));
-  window.dispatchEvent(new Event("gamehub-cart-updated"));
+  saveCart(cart);
 }
 
 export function PurchaseHistoryPage() {
@@ -61,13 +118,21 @@ export function PurchaseHistoryPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    setPurchases(readPurchases());
+    fetch("/api/purchases")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Purchase history could not be loaded.");
+        }
+
+        return response.json() as Promise<ApiPurchase[]>;
+      })
+      .then((records) => setPurchases(records.map(apiPurchaseToPurchase)))
+      .catch(() => setPurchases([]));
   }, []);
 
   const deletePurchase = (purchaseId: string) => {
     const nextPurchases = purchases.filter((purchase) => purchase.id !== purchaseId);
     setPurchases(nextPurchases);
-    window.localStorage.setItem(purchasesKey, JSON.stringify(nextPurchases));
     setMessage("Purchase record deleted.");
   };
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { client } from "@repo/db/client";
+import { client, resetClient } from "@repo/db/client";
+import { getCurrentCustomer } from "@/utils/userAuth";
 
 type PurchasePayload = {
   firstName?: string;
@@ -17,12 +18,49 @@ function clean(value?: string) {
   return value?.trim() || "";
 }
 
+function isTransientDatabaseError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+
+  return (
+    message.includes("terminating connection due to administrator command") ||
+    message.includes("Server has closed the connection") ||
+    message.includes("Can't reach database server") ||
+    message.includes("Connection terminated")
+  );
+}
+
+async function runWithDatabaseRetry<T>(operation: () => Promise<T>) {
+  try {
+    return await operation();
+  } catch (error) {
+    if (!isTransientDatabaseError(error)) {
+      throw error;
+    }
+
+    await resetClient();
+    return operation();
+  }
+}
+
 export async function GET() {
-  // Public purchase history endpoint used by the customer prototype.
+  const customer = await getCurrentCustomer();
+
+  if (!customer) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Customers only see purchases made from their own account.
   const purchases = await client.db.purchase.findMany({
+    where: { userId: customer.id },
     include: {
       user: true,
-      items: true,
+      items: {
+        include: {
+          product: {
+            include: { category: true },
+          },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -32,6 +70,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   // Checkout receives cart items and turns them into persisted purchase records.
+  const customer = await getCurrentCustomer();
+
+  if (!customer) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const payload = (await request.json()) as PurchasePayload;
   const items = (payload.items || [])
     .map((item) => ({
@@ -77,43 +121,44 @@ export async function POST(request: Request) {
     return sum + (product?.price || 0) * item.quantity;
   }, 0);
 
-  const purchase = await client.db.$transaction(async (db) => {
-    // The checkout endpoint stores customer, order, and item rows together.
-    const user = await db.user.upsert({
-      where: { email },
-      update: { firstName, lastName, phone, address, postcode },
-      create: { email, firstName, lastName, phone, address, postcode },
-    });
+  const purchase = await runWithDatabaseRetry(() =>
+    client.db.$transaction(async (db) => {
+      // The checkout endpoint stores the order against the logged-in customer.
+      const user = await db.user.update({
+        where: { id: customer.id },
+        data: { firstName, lastName, phone, address, postcode },
+      });
 
-    return db.purchase.create({
-      data: {
-        id: `GH-${Date.now()}`,
-        total,
-        userId: user.id,
-        items: {
-          create: items.map((item) => {
-            const product = products.find((entry) => entry.id === item.productId);
+      return db.purchase.create({
+        data: {
+          id: `GH-${Date.now()}`,
+          total,
+          userId: user.id,
+          items: {
+            create: items.map((item) => {
+              const product = products.find((entry) => entry.id === item.productId);
 
-            if (!product) {
-              throw new Error("Product not found");
-            }
+              if (!product) {
+                throw new Error("Product not found");
+              }
 
-            return {
-              productId: product.id,
-              quantity: item.quantity,
-              unitPrice: product.price,
-              productTitle: product.title,
-              productImageUrl: product.imageUrl,
-            };
-          }),
+              return {
+                productId: product.id,
+                quantity: item.quantity,
+                unitPrice: product.price,
+                productTitle: product.title,
+                productImageUrl: product.imageUrl,
+              };
+            }),
+          },
         },
-      },
-      include: {
-        user: true,
-        items: true,
-      },
-    });
-  });
+        include: {
+          user: true,
+          items: true,
+        },
+      });
+    }),
+  );
 
   return NextResponse.json(purchase, { status: 201 });
 }

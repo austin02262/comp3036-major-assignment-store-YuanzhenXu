@@ -4,24 +4,29 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CartPreview } from "@/components/Store/CartPreview";
 import ThemeSwitch from "@/components/Themes/ThemeSwitcher";
-
-const cartKey = "gamehub-cart";
+import { readCart, setCurrentCartCustomer } from "@/utils/cartStorage";
 
 function getCartCount() {
   // Calculates total quantity, not just unique products.
   if (typeof window === "undefined") return 0;
 
   try {
-    const items = JSON.parse(window.localStorage.getItem(cartKey) || "[]") as {
-      quantity?: number;
-    }[];
+    const items = readCart();
     return items.reduce((total, item) => total + (item.quantity || 0), 0);
   } catch {
     return 0;
   }
 }
 
-export function TopMenu({ query = "" }: { query?: string }) {
+export function TopMenu({
+  query = "",
+  customerId,
+  customerName,
+}: {
+  query?: string;
+  customerId?: number;
+  customerName?: string | null;
+}) {
   const router = useRouter();
   const [cartCount, setCartCount] = useState(0);
 
@@ -29,6 +34,9 @@ export function TopMenu({ query = "" }: { query?: string }) {
     // Updates the cart badge after add/remove actions in other components.
     const updateCount = () => setCartCount(getCartCount());
 
+    if (customerId) {
+      setCurrentCartCustomer(customerId);
+    }
     updateCount();
     window.addEventListener("storage", updateCount);
     window.addEventListener("gamehub-cart-updated", updateCount);
@@ -37,12 +45,18 @@ export function TopMenu({ query = "" }: { query?: string }) {
       window.removeEventListener("storage", updateCount);
       window.removeEventListener("gamehub-cart-updated", updateCount);
     };
-  }, []);
+  }, [customerId]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Routes search text into the existing search page.
     const search = event.target.value;
     router.push(`/search?q=${search}`);
+  };
+
+  const logout = async () => {
+    await fetch("/api/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
   };
 
   return (
@@ -93,6 +107,11 @@ export function TopMenu({ query = "" }: { query?: string }) {
         </form>
 
         <div className="flex items-center gap-2">
+          {customerName && (
+            <span className="hidden text-sm font-semibold text-white/90 sm:inline">
+              Hi, {customerName}
+            </span>
+          )}
           <a
             href="/purchases"
             className="rounded-lg px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
@@ -101,6 +120,13 @@ export function TopMenu({ query = "" }: { query?: string }) {
           </a>
           <CartPreview cartCount={cartCount} />
           <ThemeSwitch />
+          <button
+            type="button"
+            onClick={logout}
+            className="rounded-lg px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </nav>

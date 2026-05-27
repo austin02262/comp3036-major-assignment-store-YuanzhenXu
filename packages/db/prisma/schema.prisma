@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -38,15 +38,17 @@ model Product {
 
 model User {
   // Customer details are stored with purchases for order history.
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  firstName String
-  lastName  String
-  phone     String
-  address   String
-  postcode  String
-  createdAt DateTime   @default(now())
-  purchases Purchase[]
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
+  username     String?    @unique
+  passwordHash String?
+  firstName    String
+  lastName     String
+  phone        String
+  address      String
+  postcode     String
+  createdAt    DateTime   @default(now())
+  purchases    Purchase[]
 }
 
 model Purchase {

@@ -2,29 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { StoreProduct } from "@/lib/storeProducts";
-
-const cartKey = "gamehub-cart";
-
-type CartItem = StoreProduct & {
-  quantity: number;
-};
-
-function readCart(): CartItem[] {
-  // Reads the browser cart used by the frontend-only prototype.
-  if (typeof window === "undefined") return [];
-
-  try {
-    return JSON.parse(window.localStorage.getItem(cartKey) || "[]") as CartItem[];
-  } catch {
-    return [];
-  }
-}
-
-function writeCart(items: CartItem[]) {
-  // Broadcasts a custom event so the navbar cart count updates immediately.
-  window.localStorage.setItem(cartKey, JSON.stringify(items));
-  window.dispatchEvent(new Event("gamehub-cart-updated"));
-}
+import { readCart, saveCart } from "@/utils/cartStorage";
 
 export function AddToCartButton({ product }: { product: StoreProduct }) {
   const [message, setMessage] = useState("");
@@ -43,12 +21,12 @@ export function AddToCartButton({ product }: { product: StoreProduct }) {
 
     if (existingItem) {
       existingItem.quantity += 1;
-      writeCart(cart);
+      saveCart(cart);
       setMessage("Item added to cart");
       return;
     }
 
-    writeCart([...cart, { ...product, quantity: 1 }]);
+    saveCart([...cart, { ...product, quantity: 1 }]);
     setMessage("Item added to cart");
   };
 
