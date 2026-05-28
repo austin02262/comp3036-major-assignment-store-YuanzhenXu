@@ -9,6 +9,7 @@ export async function registerCustomer(
   request: APIRequestContext,
   overrides: Partial<{ username: string; email: string; password: string }> = {},
 ) {
+  // Timestamped customers avoid unique email/username collisions across test retries.
   const timestamp = Date.now();
 
   return request.post("/api/register", {
@@ -25,6 +26,7 @@ export async function loginCustomer(
   page: Page,
   customer: { email: string; password: string },
 ) {
+  // UI login is used when tests need the browser to receive the HttpOnly cookie.
   await page.goto("/login");
   await page.getByLabel("Email").fill(customer.email);
   await page.getByLabel("Password").fill(customer.password);
@@ -33,6 +35,7 @@ export async function loginCustomer(
 }
 
 export async function createAndLoginCustomer(page: Page, request: APIRequestContext) {
+  // Helper for tests that need a ready-to-use customer session.
   const customer = createTestCustomer();
 
   await registerCustomer(request, customer);
@@ -41,6 +44,7 @@ export async function createAndLoginCustomer(page: Page, request: APIRequestCont
 }
 
 export function createTestCustomer() {
+  // Keeps generated users deterministic enough to debug but unique enough for CI.
   const timestamp = Date.now();
 
   return {

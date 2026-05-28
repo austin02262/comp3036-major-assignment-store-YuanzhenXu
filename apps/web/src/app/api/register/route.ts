@@ -10,6 +10,7 @@ type RegisterPayload = {
 };
 
 function clean(value?: string) {
+  // Normalizes optional JSON fields before validation and database writes.
   return value?.trim() || "";
 }
 
@@ -21,6 +22,7 @@ function usernameTaken() {
 }
 
 function uniqueConflict(error: unknown, field: string) {
+  // Prisma reports unique index conflicts as P2002, including the violated field.
   if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
 
   const target = error.meta?.target;
@@ -34,6 +36,7 @@ function uniqueConflict(error: unknown, field: string) {
 
 export async function POST(request: Request) {
   const payload = (await request.json()) as RegisterPayload;
+  // Store emails lowercase so duplicate checks are predictable.
   const username = clean(payload.username);
   const email = clean(payload.email).toLowerCase();
   const password = payload.password || "";
@@ -61,6 +64,7 @@ export async function POST(request: Request) {
   }
 
   const existingUsername = await client.db.user.findFirst({
+    // Legacy customer records used firstName as the visible name, so both fields are checked.
     where: { OR: [{ username }, { firstName: username }] },
   });
   if (existingUsername) return usernameTaken();
@@ -70,6 +74,7 @@ export async function POST(request: Request) {
       data: {
         username,
         email,
+        // Passwords are never stored directly; only the salted hash is saved.
         passwordHash: hashPassword(password),
         firstName: username,
         lastName: "",

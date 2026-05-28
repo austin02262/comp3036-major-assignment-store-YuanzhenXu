@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("CUSTOMER AUTHENTICATION", () => {
   test("redirects unauthenticated customers to login", { tag: "@a1" }, async ({ page }) => {
+    // Storefront pages are protected, so anonymous visitors land on the login form.
     await page.goto("/");
 
     await expect(page).toHaveURL(/\/login/);
@@ -9,6 +10,7 @@ test.describe("CUSTOMER AUTHENTICATION", () => {
   });
 
   test("registers a customer and then logs in", { tag: "@a1" }, async ({ page }) => {
+    // Unique credentials keep this flow repeatable across local and CI databases.
     const timestamp = Date.now();
     const username = `austin${timestamp}`;
     const email = `austin-${timestamp}@gamehub.test`;
@@ -30,6 +32,7 @@ test.describe("CUSTOMER AUTHENTICATION", () => {
   });
 
   test("shows a clear message when the account is not registered", { tag: "@a1" }, async ({ page }) => {
+    // Users get a helpful message instead of a generic authentication failure.
     await page.goto("/login");
     await page.getByLabel("Email").fill(`missing-${Date.now()}@gamehub.test`);
     await page.getByLabel("Password").fill("password123");
@@ -39,6 +42,7 @@ test.describe("CUSTOMER AUTHENTICATION", () => {
   });
 
   test("rejects duplicate usernames, duplicate emails, and usernames containing at signs", { tag: "@a1" }, async ({ page }) => {
+    // One test covers the three registration rules that protect account identity.
     const timestamp = Date.now();
     const username = `duplicate${timestamp}`;
     const email = `duplicate-${timestamp}@gamehub.test`;

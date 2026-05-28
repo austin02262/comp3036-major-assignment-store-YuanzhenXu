@@ -8,12 +8,14 @@ import {
 
 test.describe("CUSTOMER CART", () => {
   test.beforeEach(async ({ page }) => {
+    // Clear browser cart state so each test starts from an empty basket.
     await page.goto("/");
     await page.evaluate(() => window.localStorage.clear());
     await page.reload();
   });
 
   test("adds a game to cart and updates the cart preview", { tag: "@a1" }, async ({ page }) => {
+    // Covers the customer-visible cart badge, preview dialog, quantity, and removal.
     const haloCard = page.locator("article").filter({ hasText: "Halo Infinite" });
 
     await haloCard.getByRole("button", { name: "Add to Cart" }).click();
@@ -30,6 +32,7 @@ test.describe("CUSTOMER CART", () => {
   });
 
   test("keeps the account cart after logout and login", { tag: "@a1" }, async ({ page, customer }) => {
+    // Account-scoped localStorage should survive logout and restore after login.
     const haloCard = page.locator("article").filter({ hasText: "Halo Infinite" });
 
     await haloCard.getByRole("button", { name: "Add to Cart" }).click();
@@ -48,6 +51,7 @@ test.describe("CUSTOMER CART", () => {
   });
 
   test("keeps carts separate between customer accounts", { tag: "@a1" }, async ({ page, request, customer }) => {
+    // Switching users in the same browser must not leak one cart into another account.
     await page
       .locator("article")
       .filter({ hasText: "Halo Infinite" })

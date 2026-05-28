@@ -23,8 +23,8 @@ The project follows the same monorepo pattern used in the course material: appli
 
 | App | URL |
 | --- | --- |
-| Storefront | To be added after Vercel deployment |
-| Admin | To be added after Vercel deployment |
+| Storefront | https://comp3036-major-assignment-store-yua-seven.vercel.app/ |
+| Admin | https://comp3036-major-assignment-store-yua.vercel.app/ |
 
 **Local test credentials**
 
@@ -426,8 +426,8 @@ Recommended Vercel build commands:
 
 | Vercel Project | Build Command |
 | --- | --- |
-| GameHub Web | `pnpm turbo run build --filter @repo/web... --env-mode=loose` |
-| GameHub Admin | `pnpm turbo run build --filter @repo/admin... --env-mode=loose` |
+| GameHub Web | `cd ../.. && pnpm turbo build --filter=@repo/web` |
+| GameHub Admin | `cd ../.. && pnpm turbo build --filter=@repo/admin` |
 
 Environment variables for both Vercel projects:
 
@@ -441,8 +441,6 @@ Additional admin environment variable:
 ```txt
 PASSWORD_HASH
 ```
-
-After deployment, update the [Live Deployment](#live-deployment) section with the public URLs.
 
 Vercel runs Next.js pages and API routes as managed serverless functions. Neon remains the persistent PostgreSQL database shared by the storefront and admin dashboard.
 

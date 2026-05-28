@@ -9,6 +9,7 @@ type LoginPayload = {
 
 export async function POST(request: Request) {
   const payload = (await request.json()) as LoginPayload;
+  // Customer logins use email only; usernames stay display-facing.
   const email = payload.email?.trim().toLowerCase() || "";
   const password = payload.password || "";
 
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
 
   const user = await client.db.user.findUnique({ where: { email } });
 
+  // Seeded checkout users may exist without passwords, so they cannot login until registered.
   if (!user?.passwordHash) {
     return NextResponse.json(
       { error: "This account has not been registered." },
@@ -28,6 +30,7 @@ export async function POST(request: Request) {
     );
   }
 
+  // Password comparison is delegated to the shared hashing utility.
   if (!verifyPassword(password, user.passwordHash)) {
     return NextResponse.json(
       { error: "Invalid email or password." },
@@ -35,6 +38,7 @@ export async function POST(request: Request) {
     );
   }
 
+  // The browser receives only an HttpOnly session cookie, not the password hash.
   await setCustomerSession(user.id);
 
   return NextResponse.json({

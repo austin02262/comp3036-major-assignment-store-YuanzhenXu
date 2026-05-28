@@ -24,6 +24,7 @@ function parseGalleryImages(value: string) {
 
   if (trimmedValue.startsWith("[")) {
     try {
+      // New admin uploads are stored as JSON so data URLs can safely contain commas.
       const parsed = JSON.parse(trimmedValue);
       return Array.isArray(parsed)
         ? parsed.filter((image): image is string => typeof image === "string")
@@ -33,6 +34,7 @@ function parseGalleryImages(value: string) {
     }
   }
 
+  // Legacy seed data used comma-separated URLs, while uploaded data URLs also contain commas.
   return trimmedValue
     .match(/data:image\/[^;]+;base64,[^,]+(?=,data:image\/|$)|[^,]+/g)
     ?.map((image) => image.trim())
@@ -42,6 +44,7 @@ function parseGalleryImages(value: string) {
 export function productRecordToAdminProduct(
   product: ProductRecord,
 ): AdminProduct {
+  // Converts Prisma records into the shape expected by the client-side admin UI.
   const releaseDate = new Date(product.releaseDate);
 
   return {

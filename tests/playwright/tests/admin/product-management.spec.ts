@@ -7,9 +7,11 @@ async function login(page: Page) {
 }
 
 function productCards(page: Page) {
+  // Narrows queries to the dashboard product cards instead of unrelated page text.
   return page.locator('section[aria-label="Product management"] article');
 }
 
+// Tiny in-memory PNG lets upload tests run without committing binary fixtures.
 const tinyPng = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
   "base64",
@@ -23,6 +25,7 @@ test.describe("ADMIN PRODUCT MANAGEMENT", () => {
   });
 
   test("creates a new game in the frontend admin prototype", { tag: "@a2" }, async ({ page }) => {
+    // Unique titles avoid urlId collisions when CI retries against the same database.
     const title = `Test Drive Galaxy ${Date.now()}`;
 
     await page.getByRole("link", { name: "Add New Game" }).click();
@@ -64,6 +67,7 @@ test.describe("ADMIN PRODUCT MANAGEMENT", () => {
 
     const galleryPreview = page.getByRole("img", { name: "Gallery preview 1" });
     await expect(galleryPreview).toBeVisible();
+    // naturalWidth proves the preview image loaded, not just that an <img> tag exists.
     await expect(galleryPreview).toHaveJSProperty("naturalWidth", 1);
 
     await page.getByRole("button", { name: "Create Game" }).click();

@@ -12,6 +12,7 @@ export default function LoginPage() {
 
   const submitLogin = async (event: React.FormEvent) => {
     event.preventDefault();
+    // Keep validation feedback on the page instead of navigating after failed login.
     setError("");
     setLoading(true);
 
@@ -28,6 +29,7 @@ export default function LoginPage() {
         return;
       }
 
+      // Refresh reloads server components so the navbar sees the new session cookie.
       router.push("/");
       router.refresh();
     } catch {
@@ -94,6 +96,7 @@ function Field({
   onChange: (value: string) => void;
   type?: string;
 }) {
+  // Shared field component keeps login inputs accessible with matching labels.
   const id = label.toLowerCase();
 
   return (

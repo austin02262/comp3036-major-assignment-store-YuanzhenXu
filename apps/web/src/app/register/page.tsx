@@ -13,6 +13,7 @@ export default function RegisterPage() {
 
   const submitRegister = async (event: React.FormEvent) => {
     event.preventDefault();
+    // Registration stays client-side for quick feedback, while validation is enforced by the API.
     setError("");
     setLoading(true);
 
@@ -29,6 +30,7 @@ export default function RegisterPage() {
         return;
       }
 
+      // New users login after registration so the session is created through one path.
       router.push("/login");
     } catch {
       setError("Registration failed. Please try again.");
@@ -95,6 +97,7 @@ function Field({
   onChange: (value: string) => void;
   type?: string;
 }) {
+  // Shared field component keeps registration inputs accessible with matching labels.
   const id = label.toLowerCase();
 
   return (

@@ -2,6 +2,7 @@ import { expect, registerCustomer, test } from "./fixtures";
 
 test.describe("CUSTOMER AUTH API", () => {
   test("rejects invalid and duplicate customer registrations", { tag: "@a3" }, async ({ request }) => {
+    // API-level checks prove validation works even without the React form.
     const timestamp = Date.now();
     const username = `apiuser${timestamp}`;
     const email = `api-user-${timestamp}@gamehub.test`;
@@ -38,6 +39,7 @@ test.describe("CUSTOMER AUTH API", () => {
   });
 
   test("rejects purchase history requests before customer login", { tag: "@a3" }, async ({ request }) => {
+    // Purchase history is account data, so anonymous API calls must be rejected.
     const response = await request.get("/api/purchases");
 
     expect(response.status()).toBe(401);
