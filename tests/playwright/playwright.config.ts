@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import "dotenv/config";
+import dotenv from "dotenv";
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -11,11 +11,15 @@ import "dotenv/config";
 import fs from "fs";
 import path from "path";
 
+dotenv.config({ path: path.resolve("../../packages/db/.env") });
+
 // Define the directory path
 const authDir = path.resolve(".auth");
-const databaseUrl =
-  process.env.DATABASE_URL ||
-  `file:${path.resolve("../../packages/db/prisma/dev.db").replace(/\\/g, "/")}`;
+const databaseUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error("TEST_DATABASE_URL or DATABASE_URL is required for Playwright tests.");
+}
 
 process.env.DATABASE_URL = databaseUrl;
 

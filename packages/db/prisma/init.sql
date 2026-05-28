@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS "User" (
   -- Customer contact and delivery details for purchase records.
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   "email" TEXT NOT NULL,
+  "username" TEXT,
+  "passwordHash" TEXT,
   "firstName" TEXT NOT NULL,
   "lastName" TEXT NOT NULL,
   "phone" TEXT NOT NULL,
@@ -63,3 +65,4 @@ CREATE TABLE IF NOT EXISTS "PurchaseItem" (
 CREATE UNIQUE INDEX IF NOT EXISTS "Category_name_key" ON "Category"("name");
 CREATE UNIQUE INDEX IF NOT EXISTS "Product_urlId_key" ON "Product"("urlId");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "User_username_key" ON "User"("username");

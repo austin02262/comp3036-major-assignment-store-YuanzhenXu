@@ -22,11 +22,16 @@
     "./url": {
       "types": "./src/url.ts",
       "default": "./dist/url.js"
+    },
+    "./password": {
+      "types": "./src/password.ts",
+      "default": "./dist/password.js"
     }
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.14.4",
     "vitest": "^3.0.4"
   },
   "dependencies": {}

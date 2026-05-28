@@ -10,6 +10,11 @@ function productCards(page: Page) {
   return page.locator('section[aria-label="Product management"] article');
 }
 
+const tinyPng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+  "base64",
+);
+
 test.describe("ADMIN PRODUCT MANAGEMENT", () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
@@ -18,11 +23,13 @@ test.describe("ADMIN PRODUCT MANAGEMENT", () => {
   });
 
   test("creates a new game in the frontend admin prototype", { tag: "@a2" }, async ({ page }) => {
+    const title = `Test Drive Galaxy ${Date.now()}`;
+
     await page.getByRole("link", { name: "Add New Game" }).click();
     await expect(page).toHaveURL("/products/create");
     await expect(page.getByRole("heading", { name: "Add New Game" })).toBeVisible();
 
-    await page.getByLabel("Game name").fill("Test Drive Galaxy");
+    await page.getByLabel("Game name").fill(title);
     await page.getByLabel("Genre").selectOption("Racing");
     await page.getByLabel("Xbox").check();
     await page.getByLabel("Price").fill("69.95");
@@ -32,7 +39,45 @@ test.describe("ADMIN PRODUCT MANAGEMENT", () => {
     await page.getByRole("button", { name: "Create Game" }).click();
 
     await expect(page).toHaveURL("/?saved=1");
-    await expect(page.getByText("Test Drive Galaxy")).toBeVisible();
+    await expect(page.getByText(title)).toBeVisible();
+  });
+
+  test("uploads gallery images and keeps them visible after saving", { tag: "@a2" }, async ({ page }) => {
+    const title = `Gallery Upload Racer ${Date.now()}`;
+
+    await page.getByRole("link", { name: "Add New Game" }).click();
+    await expect(page.getByRole("heading", { name: "Add New Game" })).toBeVisible();
+
+    await page.getByLabel("Game name").fill(title);
+    await page.getByLabel("Genre").selectOption("Racing");
+    await page.getByLabel("Xbox").check();
+    await page.getByLabel("Price").fill("49.95");
+    await page.getByLabel("Release date").fill("2026-08-20");
+    await page.getByLabel("Header image").fill("/games/forza_header.jpg");
+    await page.getByLabel("Store description").fill("Gallery upload regression test.");
+
+    await page.locator('input[type="file"]').nth(1).setInputFiles({
+      name: "gallery-preview.png",
+      mimeType: "image/png",
+      buffer: tinyPng,
+    });
+
+    const galleryPreview = page.getByRole("img", { name: "Gallery preview 1" });
+    await expect(galleryPreview).toBeVisible();
+    await expect(galleryPreview).toHaveJSProperty("naturalWidth", 1);
+
+    await page.getByRole("button", { name: "Create Game" }).click();
+    await expect(page).toHaveURL("/?saved=1");
+
+    await productCards(page)
+      .filter({ hasText: title })
+      .getByRole("link", { name: "Edit product" })
+      .click();
+
+    await expect(page.getByRole("heading", { name: "Edit Game" })).toBeVisible();
+    const savedGalleryPreview = page.getByRole("img", { name: "Gallery preview 1" });
+    await expect(savedGalleryPreview).toBeVisible();
+    await expect(savedGalleryPreview).toHaveJSProperty("naturalWidth", 1);
   });
 
   test("edits an existing game", { tag: "@a2" }, async ({ page }) => {

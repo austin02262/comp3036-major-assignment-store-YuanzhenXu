@@ -3,27 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { GameImage } from "@/components/Store/GameImage";
 import { formatPrice, type StoreProduct } from "@/lib/storeProducts";
-
-const cartKey = "gamehub-cart";
+import { readCart, saveCart } from "@/utils/cartStorage";
 
 type CartItem = StoreProduct & {
   quantity: number;
 };
-
-function readCart(): CartItem[] {
-  // Keeps the cart preview synced with localStorage.
-  try {
-    return JSON.parse(window.localStorage.getItem(cartKey) || "[]") as CartItem[];
-  } catch {
-    return [];
-  }
-}
-
-function saveCart(items: CartItem[]) {
-  // Persists quantity/remove changes from the mini cart.
-  window.localStorage.setItem(cartKey, JSON.stringify(items));
-  window.dispatchEvent(new Event("gamehub-cart-updated"));
-}
 
 export function CartPreview({ cartCount }: { cartCount: number }) {
   const [open, setOpen] = useState(false);

@@ -38,10 +38,13 @@ function toList(value?: string[] | string) {
     .filter(Boolean);
 }
 
+function serializeGalleryImages(value?: string[] | string) {
+  return JSON.stringify(toList(value));
+}
+
 function normalizePayload(payload: ProductPayload) {
   // Normalizes admin form input into the Product database shape.
   const platforms = toList(payload.platforms);
-  const galleryImages = toList(payload.galleryImages);
   const releaseDate = payload.releaseDate
     ? new Date(`${payload.releaseDate}T00:00:00`)
     : new Date();
@@ -51,7 +54,7 @@ function normalizePayload(payload: ProductPayload) {
     description: payload.description?.trim() || "",
     content: payload.content?.trim() || payload.description?.trim() || "",
     imageUrl: payload.imageUrl?.trim() || "",
-    galleryImages: galleryImages.join(","),
+    galleryImages: serializeGalleryImages(payload.galleryImages),
     category: payload.category?.trim() || "Action",
     platform: payload.platform?.trim() || platforms.join(", ") || "PlayStation",
     platforms: platforms.length > 0 ? platforms.join(",") : "PlayStation",

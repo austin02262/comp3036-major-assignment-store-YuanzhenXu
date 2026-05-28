@@ -17,6 +17,28 @@ type ProductRecord = {
   };
 };
 
+function parseGalleryImages(value: string) {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) return [];
+
+  if (trimmedValue.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmedValue);
+      return Array.isArray(parsed)
+        ? parsed.filter((image): image is string => typeof image === "string")
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return trimmedValue
+    .match(/data:image\/[^;]+;base64,[^,]+(?=,data:image\/|$)|[^,]+/g)
+    ?.map((image) => image.trim())
+    .filter(Boolean) || [];
+}
+
 export function productRecordToAdminProduct(
   product: ProductRecord,
 ): AdminProduct {
@@ -28,10 +50,7 @@ export function productRecordToAdminProduct(
     title: product.title,
     description: product.description,
     imageUrl: product.imageUrl,
-    galleryImages: product.galleryImages
-      .split(",")
-      .map((image) => image.trim())
-      .filter(Boolean),
+    galleryImages: parseGalleryImages(product.galleryImages),
     category: product.category.name,
     platforms: product.platforms
       .split(",")

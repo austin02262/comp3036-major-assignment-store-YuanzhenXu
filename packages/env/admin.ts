@@ -7,7 +7,8 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    PASSWORD: z.string(),
+    PASSWORD: z.string().optional(),
+    PASSWORD_HASH: z.string().optional(),
     JWT_SECRET: z.string(),
   },
 
@@ -28,6 +29,7 @@ export const env = createEnv({
     // E2E: process.env.E2E,
     // Local defaults keep the classroom demo easy to run without private env files.
     PASSWORD: process.env.PASSWORD || "123",
+    PASSWORD_HASH: process.env.PASSWORD_HASH,
     JWT_SECRET: process.env.JWT_SECRET || "local-admin-secret",
   },
   /**

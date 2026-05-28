@@ -2,13 +2,23 @@ import type { PropsWithChildren } from "react";
 import { LeftMenu } from "../Menu/LeftMenu";
 import { TopMenu } from "../Layout/TopMenu";
 import { ThemeProvider } from "@/components/Themes/ThemeContext";
+import { requireCustomer } from "@/utils/userAuth";
 
-export function AppLayout({ children, query }: PropsWithChildren<{ query?: string }>) {
+export async function AppLayout({
+  children,
+  query,
+}: PropsWithChildren<{ query?: string }>) {
+  const customer = await requireCustomer();
+
   // Shared storefront shell with navbar, filters, and theme support.
   return (
     <ThemeProvider>
       <div className="min-h-screen text-[var(--text)]">
-        <TopMenu query={query} />
+        <TopMenu
+          query={query}
+          customerId={customer.id}
+          customerName={customer.username || customer.firstName}
+        />
         <div className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:px-8">
           <aside className="hidden lg:block">
             <div className="sticky top-24">

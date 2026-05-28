@@ -17,6 +17,8 @@ jobs:
       PASSWORD: "123"
       JWT_SECRET: "local-admin-secret"
       SKIP_ENV_VALIDATION: "1"
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
 
     steps:
       - name: Checkout code
@@ -40,11 +42,11 @@ jobs:
         working-directory: tests/playwright
         run: pnpm playwright install chromium --with-deps
 
-      - name: Initialize SQLite database
-        run: DATABASE_URL=file:./dev.db pnpm --filter @repo/db db:init
+      - name: Push database schema
+        run: pnpm --filter @repo/db exec prisma db push --accept-data-loss
 
       - name: Seed GameHub products
-        run: DATABASE_URL=file:./dev.db pnpm --filter @repo/db db:seed
+        run: pnpm --filter @repo/db db:seed
 
       - name: Type check
         run: pnpm turbo check-types

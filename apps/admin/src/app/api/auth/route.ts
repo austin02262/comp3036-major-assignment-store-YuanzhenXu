@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { env } from "@repo/env/admin";
+import { verifyPassword } from "@repo/utils/password";
 
 function isJsonRequest(request: Request) {
   // One route supports the login form and programmatic requests by checking the content type.
@@ -22,10 +23,20 @@ async function readPassword(request: Request) {
   return typeof password === "string" ? password : undefined;
 }
 
+function isValidAdminPassword(password?: string) {
+  if (!password) return false;
+
+  if (env.PASSWORD_HASH) {
+    return verifyPassword(password, env.PASSWORD_HASH);
+  }
+
+  return password === env.PASSWORD;
+}
+
 export async function POST(request: Request) {
   const password = await readPassword(request); // read the password
 
-  if (password !== env.PASSWORD) { // checkk the website
+  if (!isValidAdminPassword(password)) { // check the website
     if (!isJsonRequest(request)) {
       return NextResponse.redirect(new URL("/", request.url)); // return the user to the login page
     }
