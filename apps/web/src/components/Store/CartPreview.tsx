@@ -17,6 +17,7 @@ export function CartPreview({ cartCount }: { cartCount: number }) {
     const updateItems = () => setItems(readCart());
 
     updateItems();
+    // The native event covers other tabs; the custom event refreshes this tab immediately.
     window.addEventListener("storage", updateItems);
     window.addEventListener("gamehub-cart-updated", updateItems);
 

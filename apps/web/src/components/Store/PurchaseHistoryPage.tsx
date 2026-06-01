@@ -53,6 +53,7 @@ type ApiPurchase = {
 };
 
 function apiPurchaseToPurchase(purchase: ApiPurchase): Purchase {
+  // Rebuilds storefront product fields from the normalized purchase API response.
   return {
     id: purchase.id,
     customerName: `${purchase.user.firstName} ${purchase.user.lastName}`.trim(),
@@ -131,6 +132,7 @@ export function PurchaseHistoryPage() {
   }, []);
 
   const deletePurchase = (purchaseId: string) => {
+    // History deletion is a client-side prototype action; stored purchase records stay auditable.
     const nextPurchases = purchases.filter((purchase) => purchase.id !== purchaseId);
     setPurchases(nextPurchases);
     setMessage("Purchase record deleted.");

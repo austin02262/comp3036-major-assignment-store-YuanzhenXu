@@ -15,6 +15,17 @@ test.describe("ADMIN AUTH AND DASHBOARD", () => {
     await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
   });
 
+  test("rejects an incorrect admin password", { tag: "@a2" }, async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Password", { exact: true }).fill("wrong-password");
+    await page.getByRole("button", { name: "Sign In" }).click();
+
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("heading", { name: "Sign in to manage products" })).toBeVisible();
+    const cookies = await page.context().cookies();
+    expect(cookies.find((cookie) => cookie.name === "auth_token")).toBeUndefined();
+  });
+
   test("logs in and logs out", { tag: "@a2" }, async ({ page }) => {
     await login(page);
 
@@ -24,7 +35,16 @@ test.describe("ADMIN AUTH AND DASHBOARD", () => {
     const cookies = await page.context().cookies();
     expect(cookies.find((cookie) => cookie.name === "auth_token")).toBeDefined();
 
-    await page.getByText("Logout").click();
+    const [logoutResponse] = await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.url().endsWith("/api/auth") &&
+          response.request().method() === "DELETE",
+      ),
+      page.getByText("Logout").click(),
+    ]);
+    expect(logoutResponse.ok(), await logoutResponse.text()).toBeTruthy();
+    await page.reload();
     await expect(page.getByRole("heading", { name: "Sign in to manage products" })).toBeVisible();
   });
 });
