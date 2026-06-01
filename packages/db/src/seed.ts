@@ -3,40 +3,43 @@ import { products } from "./data.js";
 import { fileURLToPath } from "node:url";
 
 export async function seed() {
-  // Reset dependent tables first so repeated seeds start from a clean database.
-  await client.db.purchaseItem.deleteMany();
-  await client.db.purchase.deleteMany();
-  await client.db.user.deleteMany();
-  await client.db.product.deleteMany();
-  await client.db.category.deleteMany();
+  // Publish the reset and seed atomically so applications never read a partial catalogue.
+  await client.db.$transaction(async (tx) => {
+    // Reset dependent tables first so repeated seeds start from a clean database.
+    await tx.purchaseItem.deleteMany();
+    await tx.purchase.deleteMany();
+    await tx.user.deleteMany();
+    await tx.product.deleteMany();
+    await tx.category.deleteMany();
 
-  for (const product of products) {
-    // Each product is linked to a reusable category row.
-    const category = await client.db.category.upsert({
-      where: { name: product.category },
-      update: {},
-      create: { name: product.category },
-    });
+    for (const product of products) {
+      // Each product is linked to a reusable category row.
+      const category = await tx.category.upsert({
+        where: { name: product.category },
+        update: {},
+        create: { name: product.category },
+      });
 
-    await client.db.product.create({
-      data: {
-        id: product.id,
-        urlId: product.urlId,
-        title: product.title,
-        description: product.description,
-        content: product.content,
-        imageUrl: product.imageUrl,
-        galleryImages: product.galleryImages.join(","),
-        platform: product.platform,
-        platforms: product.platforms.join(","),
-        price: product.price,
-        stock: product.stock,
-        releaseDate: product.releaseDate,
-        active: product.active,
-        categoryId: category.id,
-      },
-    });
-  }
+      await tx.product.create({
+        data: {
+          id: product.id,
+          urlId: product.urlId,
+          title: product.title,
+          description: product.description,
+          content: product.content,
+          imageUrl: product.imageUrl,
+          galleryImages: product.galleryImages.join(","),
+          platform: product.platform,
+          platforms: product.platforms.join(","),
+          price: product.price,
+          stock: product.stock,
+          releaseDate: product.releaseDate,
+          active: product.active,
+          categoryId: category.id,
+        },
+      });
+    }
+  });
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

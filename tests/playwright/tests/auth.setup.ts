@@ -12,58 +12,44 @@ setup("reset database and seed products", async () => {
   const db = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
 
   try {
-    // Delete child records first to satisfy relational foreign keys.
-    await db.purchaseItem.deleteMany();
-    await db.purchase.deleteMany();
-    await db.user.deleteMany();
-    await db.product.deleteMany();
-    await db.category.deleteMany();
+    // Publish the reset and seed atomically so readers never observe a partially rebuilt catalogue.
+    await db.$transaction(async (tx) => {
+      // Delete child records first to satisfy relational foreign keys.
+      await tx.purchaseItem.deleteMany();
+      await tx.purchase.deleteMany();
+      await tx.user.deleteMany();
+      await tx.product.deleteMany();
+      await tx.category.deleteMany();
 
-    for (const product of products) {
-      // Recreate categories while preserving product-category relationships.
-      const category = await db.category.upsert({
-        where: { name: product.category },
-        update: {},
-        create: { name: product.category },
-      });
+      for (const product of products) {
+        // Recreate categories while preserving product-category relationships.
+        const category = await tx.category.upsert({
+          where: { name: product.category },
+          update: {},
+          create: { name: product.category },
+        });
 
-      // Upsert also makes setup recover cleanly if an earlier shared-database run was interrupted.
-      await db.product.upsert({
-        where: { id: product.id },
-        update: {
-          urlId: product.urlId,
-          title: product.title,
-          description: product.description,
-          content: product.content,
-          imageUrl: product.imageUrl,
-          galleryImages: product.galleryImages.join(","),
-          platform: product.platform,
-          platforms: product.platforms.join(","),
-          price: product.price,
-          stock: product.stock,
-          releaseDate: product.releaseDate,
-          active: product.active,
-          categoryId: category.id,
-        },
-        create: {
-          id: product.id,
-          urlId: product.urlId,
-          title: product.title,
-          description: product.description,
-          content: product.content,
-          imageUrl: product.imageUrl,
-          // Seed data uses comma-separated URLs; admin uploads are stored as JSON later.
-          galleryImages: product.galleryImages.join(","),
-          platform: product.platform,
-          platforms: product.platforms.join(","),
-          price: product.price,
-          stock: product.stock,
-          releaseDate: product.releaseDate,
-          active: product.active,
-          categoryId: category.id,
-        },
-      });
-    }
+        await tx.product.create({
+          data: {
+            id: product.id,
+            urlId: product.urlId,
+            title: product.title,
+            description: product.description,
+            content: product.content,
+            imageUrl: product.imageUrl,
+            // Seed data uses comma-separated URLs; admin uploads are stored as JSON later.
+            galleryImages: product.galleryImages.join(","),
+            platform: product.platform,
+            platforms: product.platforms.join(","),
+            price: product.price,
+            stock: product.stock,
+            releaseDate: product.releaseDate,
+            active: product.active,
+            categoryId: category.id,
+          },
+        });
+      }
+    });
   } finally {
     await db.$disconnect();
   }
