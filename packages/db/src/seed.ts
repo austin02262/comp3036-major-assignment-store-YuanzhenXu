@@ -39,6 +39,10 @@ export async function seed() {
         },
       });
     }
+  }, {
+    // Neon may need more than Prisma's 5-second default during CI cold starts.
+    maxWait: 10_000,
+    timeout: 30_000,
   });
 }
 

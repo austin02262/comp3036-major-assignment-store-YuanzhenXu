@@ -49,6 +49,10 @@ setup("reset database and seed products", async () => {
           },
         });
       }
+    }, {
+      // Allow enough time for Neon cold starts while keeping the reset atomic.
+      maxWait: 10_000,
+      timeout: 30_000,
     });
   } finally {
     await db.$disconnect();
