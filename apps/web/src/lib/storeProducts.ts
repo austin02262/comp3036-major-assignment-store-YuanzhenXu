@@ -50,6 +50,7 @@ function parseGalleryImages(value: string) {
 
   if (trimmedValue.startsWith("[")) {
     try {
+      // Admin uploads use JSON because base64 image data can contain commas.
       const parsed = JSON.parse(trimmedValue);
       return Array.isArray(parsed)
         ? parsed.filter((image): image is string => typeof image === "string")
@@ -59,6 +60,7 @@ function parseGalleryImages(value: string) {
     }
   }
 
+  // Seed records still use comma-separated image paths for backwards compatibility.
   return trimmedValue
     .match(/data:image\/[^;]+;base64,[^,]+(?=,data:image\/|$)|[^,]+/g)
     ?.map((image) => image.trim())
@@ -66,6 +68,7 @@ function parseGalleryImages(value: string) {
 }
 
 export function productRecordToStoreProduct(product: ProductRecord): StoreProduct {
+  // Converts the Prisma record into the display shape shared by storefront components.
   const releaseDate = new Date(product.releaseDate);
 
   return {

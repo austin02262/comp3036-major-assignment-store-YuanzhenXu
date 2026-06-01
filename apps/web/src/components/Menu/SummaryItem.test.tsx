@@ -20,7 +20,7 @@ test("renders non-selected summary item with count", async () => {
 
   await expect
     .element(getByText("Link to Content").element().parentElement!)
-    .not.toHaveClass("selected");
+    .not.toHaveClass("bg-blue-700");
 });
 
 test("renders selected summary item with count", async () => {
@@ -36,5 +36,5 @@ test("renders selected summary item with count", async () => {
 
   await expect
     .element(getByText("Link to Content").element().parentElement!)
-    .toHaveClass("selected");
+    .toHaveClass("bg-blue-700", "font-bold", "text-white");
 });

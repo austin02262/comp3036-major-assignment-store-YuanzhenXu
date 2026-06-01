@@ -20,6 +20,7 @@ test.describe("ADMIN UPDATE SCREEN", () => {
   });
 
   test("creates, updates, toggles, and hides a game through the product API", { tag: "@a3" }, async ({ request }) => {
+    // Exercise the complete backend product lifecycle independently from the admin UI.
     const loginResponse = await request.post("/api/auth", {
       data: { password: "123" },
     });

@@ -58,6 +58,12 @@ export function ProductForm({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitSuccess, setSubmitSuccess] = useState("");
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    // Prevent very early interactions from submitting server-rendered values before React is ready.
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     if (!isEditing || !lookupUrlId || !initialData) {
@@ -221,14 +227,17 @@ export function ProductForm({
       isEditing ? "Product updated successfully" : "Product created successfully",
     );
 
-    window.setTimeout(() => {
-      router.push("/?saved=1");
-      router.refresh();
-    }, 700);
+    // Navigate immediately after the API confirms the database write.
+    router.push("/?saved=1");
+    router.refresh();
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <form
+      onSubmit={handleSubmit}
+      className={styles.form}
+      data-hydrated={isHydrated ? "true" : "false"}
+    >
       <div className={styles.grid}>
         <div className={styles.fieldWide}>
           <label htmlFor="title">Game name</label>
@@ -377,7 +386,9 @@ export function ProductForm({
 
       <div className={styles.actions}>
         <a href="/">Back to dashboard</a>
-        <button type="submit">{isEditing ? "Save Game" : "Create Game"}</button>
+        <button type="submit" disabled={!isHydrated}>
+          {isEditing ? "Save Game" : "Create Game"}
+        </button>
       </div>
     </form>
   );
