@@ -7,6 +7,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Every E2E group resets the same Neon database, so only one workflow may mutate it at a time.
+concurrency:
+  group: gamehub-shared-test-database
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Type Check and E2E Tests

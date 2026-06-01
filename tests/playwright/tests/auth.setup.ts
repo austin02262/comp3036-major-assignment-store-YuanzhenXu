@@ -27,8 +27,25 @@ setup("reset database and seed products", async () => {
         create: { name: product.category },
       });
 
-      await db.product.create({
-        data: {
+      // Upsert also makes setup recover cleanly if an earlier shared-database run was interrupted.
+      await db.product.upsert({
+        where: { id: product.id },
+        update: {
+          urlId: product.urlId,
+          title: product.title,
+          description: product.description,
+          content: product.content,
+          imageUrl: product.imageUrl,
+          galleryImages: product.galleryImages.join(","),
+          platform: product.platform,
+          platforms: product.platforms.join(","),
+          price: product.price,
+          stock: product.stock,
+          releaseDate: product.releaseDate,
+          active: product.active,
+          categoryId: category.id,
+        },
+        create: {
           id: product.id,
           urlId: product.urlId,
           title: product.title,
