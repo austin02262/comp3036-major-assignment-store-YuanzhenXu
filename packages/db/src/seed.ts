@@ -1,7 +1,15 @@
 import { client } from "./client.js";
 import { products, purchases, users } from "./data.js";
+import { pbkdf2Sync, randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { hashPassword } from "@repo/utils/password";
+
+function hashPassword(password: string) {
+  // Seeded demo users use the same PBKDF2 format as customer registration.
+  const salt = randomBytes(16).toString("hex");
+  const hash = pbkdf2Sync(password, salt, 100_000, 32, "sha256").toString("hex");
+
+  return `${salt}:${hash}`;
+}
 
 export async function seed() {
   // Publish the reset and seed atomically so applications never read a partial catalogue.

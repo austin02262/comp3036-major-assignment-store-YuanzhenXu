@@ -33,8 +33,7 @@
     }
   },
   "dependencies": {
-    "@repo/env": "workspace:*",
-    "@repo/utils": "workspace:*"
+    "@repo/env": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
