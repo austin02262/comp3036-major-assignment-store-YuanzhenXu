@@ -67,27 +67,36 @@ jobs:
       - name: Customer E2E tests
         id: test-1
         uses: education/autograding-command-grader@v1
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
         with:
           test-name: Customer E2E tests
-          command: pnpm turbo test-1
+          command: DATABASE_URL="$DATABASE_URL" TEST_DATABASE_URL="$TEST_DATABASE_URL" pnpm turbo test-1
           timeout: 20
           max-score: 10
 
       - name: Admin E2E tests
         id: test-2
         uses: education/autograding-command-grader@v1
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
         with:
           test-name: Admin E2E tests
-          command: pnpm turbo test-2
+          command: DATABASE_URL="$DATABASE_URL" TEST_DATABASE_URL="$TEST_DATABASE_URL" pnpm turbo test-2
           timeout: 20
           max-score: 10
 
       - name: Backend/API E2E tests
         id: test-3
         uses: education/autograding-command-grader@v1
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
         with:
           test-name: Backend/API E2E tests
-          command: pnpm turbo test-3
+          command: DATABASE_URL="$DATABASE_URL" TEST_DATABASE_URL="$TEST_DATABASE_URL" pnpm turbo test-3
           timeout: 20
           max-score: 10
 
