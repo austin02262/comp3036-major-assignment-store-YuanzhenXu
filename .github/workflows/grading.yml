@@ -48,6 +48,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Configure test database
+        run: printf 'DATABASE_URL="%s"\nTEST_DATABASE_URL="%s"\n' "$DATABASE_URL" "$DATABASE_URL" > packages/db/.env
+
       - name: Install Playwright browsers
         working-directory: tests/playwright
         run: pnpm playwright install chromium --with-deps
@@ -72,7 +75,7 @@ jobs:
           TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
         with:
           test-name: Customer E2E tests
-          command: DATABASE_URL="$DATABASE_URL" TEST_DATABASE_URL="$TEST_DATABASE_URL" pnpm turbo test-1
+          command: pnpm turbo test-1
           timeout: 20
           max-score: 10
 
@@ -84,7 +87,7 @@ jobs:
           TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
         with:
           test-name: Admin E2E tests
-          command: DATABASE_URL="$DATABASE_URL" TEST_DATABASE_URL="$TEST_DATABASE_URL" pnpm turbo test-2
+          command: pnpm turbo test-2
           timeout: 20
           max-score: 10
 
@@ -96,7 +99,7 @@ jobs:
           TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || secrets.DATABASE_URL }}
         with:
           test-name: Backend/API E2E tests
-          command: DATABASE_URL="$DATABASE_URL" TEST_DATABASE_URL="$TEST_DATABASE_URL" pnpm turbo test-3
+          command: pnpm turbo test-3
           timeout: 20
           max-score: 10
 
