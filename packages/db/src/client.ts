@@ -32,6 +32,31 @@ export async function resetClient() {
   global.prisma = undefined;
 }
 
+function isTransientDatabaseError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+
+  return (
+    message.includes("terminating connection due to administrator command") ||
+    message.includes("Server has closed the connection") ||
+    message.includes("Can't reach database server") ||
+    message.includes("Connection terminated")
+  );
+}
+
+export async function runWithDatabaseRetry<T>(operation: () => Promise<T>) {
+  try {
+    return await operation();
+  } catch (error) {
+    if (!isTransientDatabaseError(error)) {
+      throw error;
+    }
+
+    // Neon can close idle pooled connections, so retry once with a fresh client.
+    await resetClient();
+    return operation();
+  }
+}
+
 export const client = {
   get db() {
     // Lazy getter delays Prisma creation until a route actually touches the database.

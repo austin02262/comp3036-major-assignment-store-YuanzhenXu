@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CartPreview } from "@/components/Store/CartPreview";
 import ThemeSwitch from "@/components/Themes/ThemeSwitcher";
@@ -30,7 +30,8 @@ export function TopMenu({
   const router = useRouter();
   const [cartCount, setCartCount] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // Initialize the account cart before clicks are handled after a page reload.
     // Updates the cart badge after add/remove actions in other components.
     const updateCount = () => setCartCount(getCartCount());
 

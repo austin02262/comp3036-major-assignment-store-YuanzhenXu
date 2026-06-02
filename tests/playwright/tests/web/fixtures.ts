@@ -38,7 +38,11 @@ export async function createAndLoginCustomer(page: Page, request: APIRequestCont
   // Helper for tests that need a ready-to-use customer session.
   const customer = createTestCustomer();
 
-  await registerCustomer(request, customer);
+  const response = await registerCustomer(request, customer);
+  // Surface registration errors immediately instead of timing out during login.
+  if (!response.ok()) {
+    throw new Error(`Customer registration failed: ${await response.text()}`);
+  }
   await loginCustomer(page, customer);
   return customer;
 }
@@ -62,7 +66,11 @@ export const test = base.extend<{
     await use(createTestCustomer());
   },
   page: async ({ page, request, customer }, use) => {
-    await registerCustomer(request, customer);
+    const response = await registerCustomer(request, customer);
+    // Surface registration errors immediately instead of timing out during login.
+    if (!response.ok()) {
+      throw new Error(`Customer registration failed: ${await response.text()}`);
+    }
     await loginCustomer(page, customer);
     await use(page);
   },

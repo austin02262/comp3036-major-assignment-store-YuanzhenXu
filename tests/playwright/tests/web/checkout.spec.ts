@@ -4,6 +4,8 @@ async function addHaloToCart(page: Page) {
   await page.goto("/");
   await page.evaluate(() => window.localStorage.clear());
   await page.reload();
+  // Wait until the account-scoped cart is ready before simulating a click.
+  await expect(page.getByRole("button", { name: "Cart (0)" })).toBeVisible();
   await page
     .locator("article")
     .filter({ hasText: "Halo Infinite" })

@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
-import { client } from "@repo/db/client";
-import { verifyPassword } from "@repo/utils/password";
+import { client, runWithDatabaseRetry } from "@repo/db/client";
 
 const cookieName = "customer_session";
 
@@ -59,10 +58,12 @@ export async function getCurrentCustomer() {
   if (!userId) return undefined;
 
   // Returning a limited user shape avoids leaking password hashes to callers.
-  return client.db.user.findUnique({
-    where: { id: userId },
-    select: { id: true, username: true, firstName: true, email: true },
-  });
+  return runWithDatabaseRetry(() =>
+    client.db.user.findUnique({
+      where: { id: userId },
+      select: { id: true, username: true, firstName: true, email: true },
+    }),
+  );
 }
 
 export async function requireCustomer() {

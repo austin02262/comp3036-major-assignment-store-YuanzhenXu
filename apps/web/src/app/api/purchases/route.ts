@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { client, resetClient } from "@repo/db/client";
+import { client, runWithDatabaseRetry } from "@repo/db/client";
 import { getCurrentCustomer } from "@/utils/userAuth";
 
 type PurchasePayload = {
@@ -16,30 +16,6 @@ type PurchasePayload = {
 function clean(value?: string) {
   // Trims optional form values before server-side validation.
   return value?.trim() || "";
-}
-
-function isTransientDatabaseError(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-
-  return (
-    message.includes("terminating connection due to administrator command") ||
-    message.includes("Server has closed the connection") ||
-    message.includes("Can't reach database server") ||
-    message.includes("Connection terminated")
-  );
-}
-
-async function runWithDatabaseRetry<T>(operation: () => Promise<T>) {
-  try {
-    return await operation();
-  } catch (error) {
-    if (!isTransientDatabaseError(error)) {
-      throw error;
-    }
-
-    await resetClient();
-    return operation();
-  }
 }
 
 export async function GET() {
