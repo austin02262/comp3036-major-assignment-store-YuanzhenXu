@@ -49,7 +49,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Configure test database
-        run: printf 'DATABASE_URL="%s"\nTEST_DATABASE_URL="%s"\n' "$DATABASE_URL" "$DATABASE_URL" > packages/db/.env
+        run: printf 'DATABASE_URL="%s"\nTEST_DATABASE_URL="%s"\nCI=true\nE2E=true\n' "$DATABASE_URL" "$DATABASE_URL" > packages/db/.env
 
       - name: Install Playwright browsers
         working-directory: tests/playwright
