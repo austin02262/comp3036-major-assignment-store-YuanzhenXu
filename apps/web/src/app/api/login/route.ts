@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { client } from "@repo/db/client";
+import { client, runWithDatabaseRetry } from "@repo/db/client";
 import { setCustomerSession, verifyPassword } from "@/utils/userAuth";
 
 type LoginPayload = {
@@ -20,7 +20,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const user = await client.db.user.findUnique({ where: { email } });
+  const user = await runWithDatabaseRetry(() =>
+    client.db.user.findUnique({ where: { email } }),
+  );
 
   // Seeded checkout users may exist without passwords, so they cannot login until registered.
   if (!user?.passwordHash) {

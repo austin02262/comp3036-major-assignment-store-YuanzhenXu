@@ -16,6 +16,28 @@ export type ProductSeed = {
   active: boolean;
 };
 
+export type UserSeed = {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  postcode: string;
+};
+
+export type PurchaseSeed = {
+  id: string;
+  userId: number;
+  createdAt: Date;
+  items: {
+    productId: number;
+    quantity: number;
+  }[];
+};
+
 export const products: ProductSeed[] = [
   // Initial catalogue used by local development, tests, and database seeding.
   {
@@ -187,5 +209,33 @@ export const products: ProductSeed[] = [
     stock: 13,
     releaseDate: new Date("2020-12-10T00:00:00"),
     active: true,
+  },
+];
+
+export const users: UserSeed[] = [
+  // Demo customer makes the seeded purchase history visible after database setup.
+  {
+    id: 201,
+    username: "demo-customer",
+    email: "demo@gamehub.example",
+    password: "gamehub123",
+    firstName: "Demo",
+    lastName: "Customer",
+    phone: "0400 123 456",
+    address: "10 GameHub Street, Sydney NSW",
+    postcode: "2000",
+  },
+];
+
+export const purchases: PurchaseSeed[] = [
+  // Seeded order demonstrates the User -> Purchase -> PurchaseItem relationships.
+  {
+    id: "GH-DEMO-001",
+    userId: 201,
+    createdAt: new Date("2026-05-20T10:30:00"),
+    items: [
+      { productId: 101, quantity: 1 },
+      { productId: 103, quantity: 2 },
+    ],
   },
 ];

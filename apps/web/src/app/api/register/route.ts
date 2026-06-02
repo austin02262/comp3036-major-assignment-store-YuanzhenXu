@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-import { client } from "@repo/db/client";
+import { client, runWithDatabaseRetry } from "@repo/db/client";
 import { hashPassword } from "@/utils/userAuth";
 
 type RegisterPayload = {
@@ -55,7 +55,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const existingEmail = await client.db.user.findUnique({ where: { email } });
+  const existingEmail = await runWithDatabaseRetry(() =>
+    client.db.user.findUnique({ where: { email } }),
+  );
   if (existingEmail) {
     return NextResponse.json(
       { error: "An account already exists for this email." },
@@ -63,27 +65,31 @@ export async function POST(request: Request) {
     );
   }
 
-  const existingUsername = await client.db.user.findFirst({
-    // Legacy customer records used firstName as the visible name, so both fields are checked.
-    where: { OR: [{ username }, { firstName: username }] },
-  });
+  const existingUsername = await runWithDatabaseRetry(() =>
+    client.db.user.findFirst({
+      // Legacy customer records used firstName as the visible name, so both fields are checked.
+      where: { OR: [{ username }, { firstName: username }] },
+    }),
+  );
   if (existingUsername) return usernameTaken();
 
   try {
-    const user = await client.db.user.create({
-      data: {
-        username,
-        email,
-        // Passwords are never stored directly; only the salted hash is saved.
-        passwordHash: hashPassword(password),
-        firstName: username,
-        lastName: "",
-        phone: "",
-        address: "",
-        postcode: "",
-      },
-      select: { id: true, username: true, email: true },
-    });
+    const user = await runWithDatabaseRetry(() =>
+      client.db.user.create({
+        data: {
+          username,
+          email,
+          // Passwords are never stored directly; only the salted hash is saved.
+          passwordHash: hashPassword(password),
+          firstName: username,
+          lastName: "",
+          phone: "",
+          address: "",
+          postcode: "",
+        },
+        select: { id: true, username: true, email: true },
+      }),
+    );
 
     return NextResponse.json(user, { status: 201 });
   } catch (error) {

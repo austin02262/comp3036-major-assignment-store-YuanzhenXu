@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { GameImage } from "@/components/Store/GameImage";
 import { formatPrice, type StoreProduct } from "@/lib/storeProducts";
 import { readCart, saveCart } from "@/utils/cartStorage";
@@ -13,7 +13,8 @@ export function CartPreview({ cartCount }: { cartCount: number }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<CartItem[]>([]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // Bind cart listeners before the user can add an item after a page reload.
     const updateItems = () => setItems(readCart());
 
     updateItems();

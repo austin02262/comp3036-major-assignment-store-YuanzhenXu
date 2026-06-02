@@ -34,6 +34,11 @@ if (!fs.existsSync(authDir)) {
  */
 export default defineConfig({
   testDir: "./tests",
+  // Cloud database cold starts and local Next.js compilation can exceed Playwright defaults.
+  timeout: 90_000,
+  expect: {
+    timeout: 15_000,
+  },
   /* Run tests in files in parallel */
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -49,6 +54,8 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: "http://localhost:3002",
+    actionTimeout: 60_000,
+    navigationTimeout: 60_000,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
